@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para mi cati hermosa💗</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/themes.css">
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loader" id="loader">
+    <div class="loader-heart">💖</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="glass-container">
+    <h1>Bienvenida al portal del amor mi reina💗</h1>
+    
+    <div class="button-container">
+      <button id="heartButton">Presióname mi vida! 💕</button>
+    </div>
+
+    <div class="music-player">
+      <div class="music-info">
+        <div class="song-title" id="songTitle">No hay música</div>
+        <div style="opacity: 0.7; font-size: 0.9rem;">Música para ti 🎵</div>
+      </div>
+      <div class="music-controls">
+        <button class="music-btn" id="shuffleBtn">⇄</button>
+        <button class="music-btn prev" id="prevBtn">⏮</button>
+        <button class="music-btn rewind" id="rewindBtn">↺</button>
+        <button class="music-btn play play-btn" id="playBtn">▶︎</button>
+        <button class="music-btn forward" id="forwardBtn">↻</button>
+        <button class="music-btn next" id="nextBtn">⏭</button>
+        <button class="music-btn active" id="sequenceBtn">↳↰</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden audio element -->
+  <audio id="bgMusic" preload="auto"></audio>
+
+  <!-- Weather Floating Button -->
+  <div class="weather-float-btn" id="weatherBtn" title="Weather of Love">
+    ☁️
+  </div>
+
+  <!-- Cloud Layer (for weather effects) -->
+  <div class="cloud-layer" id="cloudLayer"></div>
+
+  <!-- Rain Background Layer -->
+  <div class="rain-background" id="rainBackground"></div>
+
+  <!-- Alpine Scene (for snow weather) -->
+  <div class="alpine-scene" id="alpineScene"></div>
+
+  <!-- Weather Menu Popup -->
+  <div class="weather-menu" id="weatherMenu">
+    <div class="weather-menu-title">Weather of Love 💖</div>
+    <div class="weather-options">
+      <div class="weather-option" data-weather="heart-rain">
+        <div class="weather-icon">💗</div>
+        <div class="weather-label">Heart Rain</div>
+      </div>
+      <div class="weather-option" data-weather="love-snow">
+        <div class="weather-icon">❄️</div>
+        <div class="weather-label">Love Snow</div>
+      </div>
+      <div class="weather-option" data-weather="rose-petals">
+        <div class="weather-icon">🌹</div>
+        <div class="weather-label">Rose Petals</div>
+      </div>
+      <div class="weather-option" data-weather="cherry-blossoms">
+        <div class="weather-icon">🌸</div>
+        <div class="weather-label">Cherry Blossoms</div>
+      </div>
+      <div class="weather-option" data-weather="starry-romance">
+        <div class="weather-icon">✨</div>
+        <div class="weather-label">Starry Romance</div>
+      </div>
+      <div class="weather-option" data-weather="sunny-bliss">
+        <div class="weather-icon">☀️</div>
+        <div class="weather-label">Sunny Bliss</div>
+      </div>
+      <div class="weather-option selected" data-weather="clear-sky">
+        <div class="weather-icon">☁️</div>
+        <div class="weather-label">Clear Sky</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Files (in order of dependency) -->
+  <script src="js/music.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
