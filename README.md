@@ -1,7 +1,5 @@
 # portal_del_amor
 
-# Para Mi Cati Hermosa 💗
-
 A beautiful, romantic interactive website with music player and dynamic weather effects.
 
 ## 📁 Project Structure
