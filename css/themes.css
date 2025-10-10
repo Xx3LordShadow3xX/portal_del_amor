@@ -257,19 +257,18 @@ body.bg-clear-sky {
   opacity: 0.55;
 }
 
-/* Snow cap - properly positioned on top */
+/* Snow cap - positioned to replace mountain peak */
 .snow-cap {
   position: absolute;
-  bottom: 100%;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 90px solid transparent;
-  border-right: 90px solid transparent;
-  border-bottom: 120px solid rgba(255, 255, 255, 0.95);
-  filter: blur(3px);
-  margin-bottom: -5px;
+  border-left: 60px solid transparent;
+  border-right: 60px solid transparent;
+  border-bottom: 80px solid rgba(255, 255, 255, 0.95);
+  filter: blur(2px);
 }
 
 /* Mountain Fog */
