@@ -526,24 +526,32 @@ const WeatherSystem = {
         return;
       }
       
-      const windInfluence = layer === 'far' ? 0.4 : (layer === 'mid' ? 0.7 : 1.0);
-      const totalDrift = baseDrift + (self.currentWindForce.x * windInfluence * 300);
+      // Snow is highly affected by wind
+      const windInfluence = layer === 'far' ? 0.5 : (layer === 'mid' ? 0.8 : 1.2);
+      const totalDrift = baseDrift + (self.currentWindForce.x * windInfluence * 350);
       
-      const easedProgress = progress * (2 - progress);
+      // Gentle floating easing
+      const easedProgress = 1 - Math.pow(1 - progress, 2);
       
-      const swayFrequency = 2 + (layer === 'close' ? 1 : 0);
-      const swayAmplitude = layer === 'far' ? 10 : (layer === 'mid' ? 20 : 30);
-      const sway = Math.sin(progress * Math.PI * swayFrequency) * swayAmplitude * (1 - progress * 0.5);
+      // Complex swaying motion - snow swirls more naturally
+      const swayFrequency1 = 2 + (layer === 'close' ? 1 : 0);
+      const swayFrequency2 = 3.5;
+      const swayAmplitude = layer === 'far' ? 15 : (layer === 'mid' ? 30 : 45);
+      const sway = (
+        Math.sin(progress * Math.PI * swayFrequency1) * swayAmplitude * (1 - progress * 0.3) +
+        Math.cos(progress * Math.PI * swayFrequency2) * (swayAmplitude * 0.4)
+      );
       
-      const currentY = easedProgress * (window.innerHeight + 100);
+      const currentY = easedProgress * (window.innerHeight + 120);
       const currentX = progress * totalDrift + sway;
       const currentRotation = rotationStart + (rotationEnd - rotationStart) * progress;
       
+      // Fade in/out more gradually
       let currentOpacity = opacity;
-      if (progress < 0.15) {
-        currentOpacity = opacity * (progress / 0.15);
-      } else if (progress > 0.9) {
-        currentOpacity = opacity * ((1 - progress) / 0.1);
+      if (progress < 0.2) {
+        currentOpacity = opacity * (progress / 0.2);
+      } else if (progress > 0.85) {
+        currentOpacity = opacity * ((1 - progress) / 0.15);
       }
       
       element.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${currentRotation}deg)`;
