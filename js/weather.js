@@ -430,21 +430,18 @@ const WeatherSystem = {
       let layer, size, blur, speed, opacity;
       
       if (layerRandom < 0.35) {
-        // Far layer - smallest, slowest, most blurred
         layer = 'far';
         size = 8 + Math.random() * 8;
         blur = 4 + Math.random() * 2;
         speed = 10000 + Math.random() * 5000;
         opacity = 0.25 + Math.random() * 0.2;
       } else if (layerRandom < 0.7) {
-        // Mid layer
         layer = 'mid';
         size = 16 + Math.random() * 12;
         blur = 1.5 + Math.random() * 1.5;
         speed = 6000 + Math.random() * 3000;
         opacity = 0.45 + Math.random() * 0.25;
       } else {
-        // Close layer - largest, fastest, sharpest
         layer = 'close';
         size = 28 + Math.random() * 22;
         blur = 0;
@@ -467,7 +464,6 @@ const WeatherSystem = {
       particle.style.left = startX + 'px';
       particle.style.top = '-100px';
       
-      // Snow drifts more than rain
       let baseDrift = (Math.random() - 0.5) * 300;
       
       const rotationStart = Math.random() * 360;
@@ -492,7 +488,6 @@ const WeatherSystem = {
       if (self.currentWeather === 'love-snow') {
         createSnowParticle();
         
-        // Varied spawn rate for more natural effect
         const nextSpawn = 150 + Math.random() * 250;
         const timeoutId = setTimeout(spawnLoop, nextSpawn);
         self.weatherAnimationFrames.push(timeoutId);
@@ -526,14 +521,11 @@ const WeatherSystem = {
         return;
       }
       
-      // Snow is highly affected by wind
       const windInfluence = layer === 'far' ? 0.5 : (layer === 'mid' ? 0.8 : 1.2);
       const totalDrift = baseDrift + (self.currentWindForce.x * windInfluence * 350);
       
-      // Gentle floating easing
       const easedProgress = 1 - Math.pow(1 - progress, 2);
       
-      // Complex swaying motion - snow swirls more naturally
       const swayFrequency1 = 2 + (layer === 'close' ? 1 : 0);
       const swayFrequency2 = 3.5;
       const swayAmplitude = layer === 'far' ? 15 : (layer === 'mid' ? 30 : 45);
@@ -546,7 +538,6 @@ const WeatherSystem = {
       const currentX = progress * totalDrift + sway;
       const currentRotation = rotationStart + (rotationEnd - rotationStart) * progress;
       
-      // Fade in/out more gradually
       let currentOpacity = opacity;
       if (progress < 0.2) {
         currentOpacity = opacity * (progress / 0.2);
@@ -773,18 +764,17 @@ const WeatherSystem = {
   createAlpineScene: function() {
     this.alpineScene.innerHTML = '';
     
-    console.log('Creating Alpine Scene');
+    console.log('🏔️ Creating Alpine Scene with gray mountains and white peaks');
     
     const mountainPositions = [
       { type: 'back', left: '5%' },
-      { type: 'back', left: '25%' },
       { type: 'mid', left: '15%' },
-      { type: 'back', left: '50%' },
-      { type: 'mid', left: '40%' },
+      { type: 'back', left: '25%' },
       { type: 'front', left: '30%' },
-      { type: 'back', left: '70%' },
-      { type: 'mid', left: '65%' },
-      { type: 'front', left: '75%' },
+      { type: 'mid', left: '40%' },
+      { type: 'back', left: '50%' },
+      { type: 'front', left: '65%' },
+      { type: 'mid', left: '70%' },
       { type: 'back', left: '85%' }
     ];
     
@@ -793,111 +783,123 @@ const WeatherSystem = {
       mountain.classList.add('mountain', `mountain-${pos.type}`);
       mountain.style.left = pos.left;
       
-      if (pos.type === 'back' || pos.type === 'mid') {
-        const snowCap = document.createElement('div');
-        snowCap.classList.add('snow-cap');
-        mountain.appendChild(snowCap);
-      }
+      // Add snow cap on top of each mountain
+      const snowCap = document.createElement('div');
+      snowCap.classList.add('snow-cap');
+      mountain.appendChild(snowCap);
       
       this.alpineScene.appendChild(mountain);
+      
+      console.log(`✅ Mountain ${index + 1}: ${pos.type} at ${pos.left}`);
     });
     
-    const fogCount = 8;
+    // Create mountain fog
+    const fogCount = 6;
     for (let i = 0; i < fogCount; i++) {
       const fog = document.createElement('div');
       fog.classList.add('mountain-fog');
       
-      const width = 200 + Math.random() * 150;
-      const height = 60 + Math.random() * 40;
+      const width = 180 + Math.random() * 120;
+      const height = 50 + Math.random() * 30;
       fog.style.width = width + 'px';
       fog.style.height = height + 'px';
-      fog.style.bottom = (20 + Math.random() * 200) + 'px';
+      fog.style.bottom = (30 + Math.random() * 150) + 'px';
       fog.style.left = (Math.random() * 100) + '%';
       
-      const duration = 40 + Math.random() * 30;
+      const duration = 45 + Math.random() * 35;
       fog.style.animationDuration = duration + 's';
       fog.style.animationDelay = -(Math.random() * duration) + 's';
       
       this.alpineScene.appendChild(fog);
     }
+    
+    console.log('✅ Alpine scene created with', mountainPositions.length, 'mountains');
   },
   
-  // === SANTA SLEIGH SYSTEM ===
+  // === SANTA SLEIGH SYSTEM (PNG-based) ===
   startSantaSleighSystem: function() {
     const self = this;
     
     function spawnSleigh() {
       if (self.currentWeather !== 'love-snow') return;
       
-      console.log('Spawning Santa sleigh!');
+      console.log('🎅 Spawning Santa sleigh with PNG images!');
       
       const sleigh = document.createElement('div');
       sleigh.classList.add('santa-sleigh');
       
-      sleigh.innerHTML = `
-        <div class="reindeer" style="left: -60px;">
-          <div class="reindeer-body">
-            <div class="reindeer-head">
-              <div class="reindeer-antler left"></div>
-              <div class="reindeer-antler right"></div>
-            </div>
-            <div class="reindeer-leg" style="left: 5px;"></div>
-            <div class="reindeer-leg" style="right: 5px;"></div>
-          </div>
-        </div>
-        <div class="reindeer" style="left: -90px; top: -10px;">
-          <div class="reindeer-body">
-            <div class="reindeer-head">
-              <div class="reindeer-antler left"></div>
-              <div class="reindeer-antler right"></div>
-            </div>
-            <div class="reindeer-leg" style="left: 5px;"></div>
-            <div class="reindeer-leg" style="right: 5px;"></div>
-          </div>
-        </div>
-        <div class="reindeer" style="left: -120px; top: -5px;">
-          <div class="reindeer-body">
-            <div class="reindeer-head">
-              <div class="reindeer-antler left"></div>
-              <div class="reindeer-antler right"></div>
-            </div>
-            <div class="reindeer-leg" style="left: 5px;"></div>
-            <div class="reindeer-leg" style="right: 5px;"></div>
-          </div>
-        </div>
-        <div class="sleigh-body">
-          <div class="sleigh-runner"></div>
-          <div class="santa-figure">
-            <div class="santa-hat"></div>
-          </div>
-        </div>
-      `;
+      // Create container for reindeer and sleigh
+      const container = document.createElement('div');
+      container.classList.add('santa-sleigh-container');
+      
+      // Reindeer image
+      const reindeer = document.createElement('img');
+      reindeer.src = 'assets/reindeer.png';
+      reindeer.alt = 'Reindeer';
+      reindeer.classList.add('reindeer-img');
+      reindeer.onerror = function() {
+        console.error('❌ Failed to load reindeer.png from assets/');
+        // Fallback to emoji if image fails
+        const fallback = document.createElement('span');
+        fallback.textContent = '🦌';
+        fallback.style.fontSize = '60px';
+        this.replaceWith(fallback);
+      };
+      
+      // Sleigh image
+      const sleighImg = document.createElement('img');
+      sleighImg.src = 'assets/santa-sleigh.png';
+      sleighImg.alt = 'Santa Sleigh';
+      sleighImg.classList.add('sleigh-img');
+      sleighImg.onerror = function() {
+        console.error('❌ Failed to load santa-sleigh.png from assets/');
+        // Fallback to emoji if image fails
+        const fallback = document.createElement('span');
+        fallback.textContent = '🎅🛷';
+        fallback.style.fontSize = '60px';
+        this.replaceWith(fallback);
+      };
+      
+      container.appendChild(reindeer);
+      container.appendChild(sleighImg);
+      sleigh.appendChild(container);
       
       document.body.appendChild(sleigh);
+      console.log('✅ Santa sleigh element created');
       
+      // Activate animation
       setTimeout(() => {
         sleigh.classList.add('active');
+        console.log('✅ Santa animation started - wavy path for 28 seconds');
       }, 100);
       
+      // Drop gifts during flight
       let giftDropCount = 0;
       const giftInterval = setInterval(() => {
-        if (giftDropCount < 5 && self.currentWeather === 'love-snow') {
+        if (giftDropCount < 6 && self.currentWeather === 'love-snow') {
           self.dropGift(sleigh);
+          console.log(`🎁 Gift ${giftDropCount + 1} dropped`);
           giftDropCount++;
         } else {
           clearInterval(giftInterval);
         }
       }, 4000);
       
+      // Remove sleigh after animation
       setTimeout(() => {
         sleigh.remove();
-      }, 25000);
+        console.log('🎅 Santa sleigh removed after flight');
+      }, 28000);
       
-      const nextSpawn = 60000 + Math.random() * 60000;
+      // Schedule next sleigh (45-90 seconds)
+      const nextSpawn = 45000 + Math.random() * 45000;
+      console.log(`⏰ Next Santa sleigh in ${Math.round(nextSpawn/1000)} seconds`);
       self.santaSleighInterval = setTimeout(spawnSleigh, nextSpawn);
     }
     
-    self.santaSleighInterval = setTimeout(spawnSleigh, 5000);
+    // First sleigh after 8 seconds
+    console.log('🎅 Santa sleigh system initialized - first spawn in 8 seconds');
+    self.santaSleighInterval = setTimeout(spawnSleigh, 8000);
   },
   
   dropGift: function(sleigh) {
@@ -911,18 +913,18 @@ const WeatherSystem = {
     `;
     
     const sleighRect = sleigh.getBoundingClientRect();
-    gift.style.left = (sleighRect.left + 40) + 'px';
-    gift.style.top = (sleighRect.top + 20) + 'px';
+    gift.style.left = (sleighRect.left + sleighRect.width / 2) + 'px';
+    gift.style.top = (sleighRect.top + sleighRect.height / 2) + 'px';
     
-    const driftX = (Math.random() - 0.5) * 100;
+    const driftX = (Math.random() - 0.5) * 120;
     gift.style.setProperty('--fall-x', driftX + 'px');
     
     document.body.appendChild(gift);
     
-    gift.style.animation = 'giftFall 4s ease-in forwards';
+    gift.style.animation = 'giftFall 5s ease-in forwards';
     
     setTimeout(() => {
       gift.remove();
-    }, 4000);
+    }, 5000);
   }
 };
