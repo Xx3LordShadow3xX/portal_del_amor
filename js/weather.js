@@ -415,9 +415,10 @@ const WeatherSystem = {
     const self = this;
     const snowColors = [
       '#ffffff', '#f0f8ff', '#e6f2ff', '#f5f5ff',
-      '#e8e8ff', '#fafafa', '#f0f0ff', '#ffffff'
+      '#e8e8ff', '#fafafa', '#f0f0ff', '#ffffff',
+      '#fdfeff', '#f8fbff', '#ffffff', '#fcfeff'
     ];
-    const snowShapes = ['❄️', '❅', '❆', '✻', '✼'];
+    const snowShapes = ['❄️', '❅', '❆', '✻', '✼', '❄', '❋'];
     
     function createSnowParticle() {
       if (self.activeWeatherParticles.length >= self.maxParticles) return;
@@ -429,23 +430,26 @@ const WeatherSystem = {
       let layer, size, blur, speed, opacity;
       
       if (layerRandom < 0.35) {
+        // Far layer - smallest, slowest, most blurred
         layer = 'far';
         size = 8 + Math.random() * 8;
-        blur = 3 + Math.random() * 2;
-        speed = 8000 + Math.random() * 4000;
-        opacity = 0.3 + Math.random() * 0.2;
+        blur = 4 + Math.random() * 2;
+        speed = 10000 + Math.random() * 5000;
+        opacity = 0.25 + Math.random() * 0.2;
       } else if (layerRandom < 0.7) {
+        // Mid layer
         layer = 'mid';
         size = 16 + Math.random() * 12;
-        blur = 1 + Math.random() * 1;
-        speed = 5000 + Math.random() * 3000;
-        opacity = 0.5 + Math.random() * 0.25;
+        blur = 1.5 + Math.random() * 1.5;
+        speed = 6000 + Math.random() * 3000;
+        opacity = 0.45 + Math.random() * 0.25;
       } else {
+        // Close layer - largest, fastest, sharpest
         layer = 'close';
-        size = 28 + Math.random() * 20;
+        size = 28 + Math.random() * 22;
         blur = 0;
         speed = 4000 + Math.random() * 2000;
-        opacity = 0.75 + Math.random() * 0.25;
+        opacity = 0.7 + Math.random() * 0.3;
       }
       
       particle.classList.add(layer);
@@ -456,16 +460,18 @@ const WeatherSystem = {
       particle.textContent = snowShape;
       particle.style.fontSize = size + 'px';
       particle.style.color = color;
-      particle.style.filter = `blur(${blur}px) drop-shadow(0 0 ${blur * 2}px rgba(255, 255, 255, 0.8))`;
+      particle.style.filter = `blur(${blur}px) drop-shadow(0 0 ${blur * 3}px rgba(200, 220, 255, 0.8))`;
       particle.style.opacity = opacity;
       
       const startX = Math.random() * window.innerWidth;
       particle.style.left = startX + 'px';
       particle.style.top = '-100px';
       
-      let baseDrift = (Math.random() - 0.5) * 250;
+      // Snow drifts more than rain
+      let baseDrift = (Math.random() - 0.5) * 300;
+      
       const rotationStart = Math.random() * 360;
-      const rotationEnd = rotationStart + (Math.random() * 180 - 90);
+      const rotationEnd = rotationStart + (Math.random() * 240 - 120);
       
       document.body.appendChild(particle);
       self.activeWeatherParticles.push(particle);
@@ -486,7 +492,8 @@ const WeatherSystem = {
       if (self.currentWeather === 'love-snow') {
         createSnowParticle();
         
-        const nextSpawn = 200 + Math.random() * 200;
+        // Varied spawn rate for more natural effect
+        const nextSpawn = 150 + Math.random() * 250;
         const timeoutId = setTimeout(spawnLoop, nextSpawn);
         self.weatherAnimationFrames.push(timeoutId);
       }
