@@ -228,37 +228,37 @@ body.bg-clear-sky {
 }
 
 .mountain-back {
-  border-bottom: 250px solid rgba(180, 200, 230, 0.3);
+  border-bottom: 250px solid rgba(140, 150, 170, 0.4);
   z-index: 1;
-  filter: blur(8px) drop-shadow(0 -5px 15px rgba(0, 0, 0, 0.1));
-  opacity: 0.6;
+  filter: blur(12px);
+  opacity: 0.5;
 }
 
 .mountain-mid {
-  border-bottom: 300px solid rgba(200, 220, 240, 0.4);
+  border-bottom: 300px solid rgba(160, 170, 190, 0.5);
   z-index: 2;
-  filter: blur(4px) drop-shadow(0 -5px 15px rgba(0, 0, 0, 0.15));
-  opacity: 0.7;
+  filter: blur(8px);
+  opacity: 0.65;
 }
 
 .mountain-front {
-  border-bottom: 350px solid rgba(220, 235, 250, 0.5);
+  border-bottom: 350px solid rgba(180, 190, 210, 0.6);
   z-index: 3;
-  filter: blur(2px) drop-shadow(0 -5px 15px rgba(0, 0, 0, 0.2));
-  opacity: 0.8;
+  filter: blur(4px);
+  opacity: 0.75;
 }
 
 .snow-cap {
   position: absolute;
-  top: -180px;
+  top: -140px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 100px solid transparent;
-  border-right: 100px solid transparent;
-  border-bottom: 160px solid rgba(255, 255, 255, 0.7);
-  filter: blur(3px) drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  border-left: 80px solid transparent;
+  border-right: 80px solid transparent;
+  border-bottom: 120px solid rgba(255, 255, 255, 0.85);
+  filter: blur(2px);
 }
 
 /* Mountain Fog */
@@ -276,147 +276,75 @@ body.bg-clear-sky {
 
 .santa-sleigh {
   position: fixed;
-  left: -200px;
-  top: 15%;
+  left: -150px;
+  top: 10%;
   z-index: 100;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.5s ease;
+  filter: blur(1px) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .santa-sleigh.active {
-  opacity: 1;
-  animation: sleighFly 20s linear forwards;
+  opacity: 0.85;
+  animation: sleighFlyNatural 25s linear forwards;
 }
 
-@keyframes sleighFly {
+@keyframes sleighFlyNatural {
   0% {
-    left: -200px;
-    top: 15%;
+    left: -150px;
+    top: 8%;
+  }
+  15% {
+    top: 12%;
   }
   25% {
-    top: 20%;
+    top: 6%;
   }
-  50% {
+  40% {
+    top: 15%;
+  }
+  52% {
+    top: 10%;
+  }
+  68% {
     top: 18%;
   }
-  75% {
-    top: 22%;
+  80% {
+    top: 12%;
+  }
+  90% {
+    top: 9%;
   }
   100% {
-    left: calc(100vw + 200px);
-    top: 20%;
+    left: calc(100vw + 150px);
+    top: 14%;
   }
 }
 
-.sleigh-body {
-  position: relative;
-  width: 80px;
-  height: 40px;
-  background: linear-gradient(135deg, #8B0000 0%, #CD5C5C 100%);
-  border-radius: 20px 20px 5px 5px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+.reindeer-img {
+  width: 50px;
+  height: auto;
+  animation: reindeerFloat 0.8s ease-in-out infinite alternate;
 }
 
-.sleigh-runner {
-  position: absolute;
-  bottom: -8px;
-  left: 10px;
+@keyframes reindeerFloat {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-6px); }
+}
+
+.sleigh-img {
   width: 60px;
-  height: 4px;
-  background: #FFD700;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+  height: auto;
+  animation: sleighBounce 0.8s ease-in-out infinite alternate;
 }
 
-.santa-figure {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 35px;
-  background: #DC143C;
-  border-radius: 50% 50% 40% 40%;
-}
-
-.santa-hat {
-  position: absolute;
-  top: -15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 20px solid #DC143C;
-}
-
-.santa-hat::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28px;
-  height: 6px;
-  background: white;
-  border-radius: 3px;
-}
-
-.reindeer {
-  position: absolute;
-  top: -15px;
-  animation: reindeerBounce 0.6s ease-in-out infinite alternate;
-}
-
-@keyframes reindeerBounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-8px); }
-}
-
-.reindeer-body {
-  position: relative;
-  width: 35px;
-  height: 20px;
-  background: #8B4513;
-  border-radius: 40% 40% 30% 30%;
-}
-
-.reindeer-head {
-  position: absolute;
-  top: -12px;
-  left: 25px;
-  width: 15px;
-  height: 15px;
-  background: #A0522D;
-  border-radius: 50%;
-}
-
-.reindeer-antler {
-  position: absolute;
-  top: -8px;
-  width: 2px;
-  height: 10px;
-  background: #654321;
-}
-
-.reindeer-antler.left {
-  left: 2px;
-  transform: rotate(-20deg);
-}
-
-.reindeer-antler.right {
-  right: 2px;
-  transform: rotate(20deg);
-}
-
-.reindeer-leg {
-  position: absolute;
-  bottom: -10px;
-  width: 3px;
-  height: 10px;
-  background: #654321;
+@keyframes sleighBounce {
+  from { transform: translateY(0px) rotate(-2deg); }
+  to { transform: translateY(-4px) rotate(2deg); }
 }
 
 /* ========================================
