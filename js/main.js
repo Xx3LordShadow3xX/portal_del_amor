@@ -54,13 +54,16 @@ function initializeApp() {
   });
   
   // Initialize weather system
-  WeatherSystem.init({
+  WeatherCore.init({
     weatherBtn: elements.weatherBtn,
     weatherMenu: elements.weatherMenu,
     cloudLayer: elements.cloudLayer,
     rainBackground: elements.rainBackground,
     alpineScene: elements.alpineScene
   });
+  
+  // Start with clear sky by default
+  ClearSkyWeather.start();
   
   // Setup heart button
   setupHeartButton(elements.heartButton);
