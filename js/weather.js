@@ -1,4 +1,435 @@
-/* ========================================
+// === LOVE SNOW SYSTEM ===
+  startLoveSnow: function() {
+    this.alpineScene.classList.add('active');
+    this.createAlpineScene();
+    
+    this.cloudLayer.style.display = 'block';
+    this.createSnowClouds();
+    
+    this.rainBackground.style.display = 'block';
+    this.createSnowBackground();
+    
+    // Start all snow-specific systems
+    this.startSantaSleighSystem();
+    this.startSnowWindSystem();
+    this.startSnowWindInterpolation();
+    this.startDayNightCycle();
+    this.createPineTrees();
+    this.createCabin();
+    this.scheduleBlizzard();
+    
+    const self = this;
+    const snowColors = [
+      '#ffffff', '#f0f8ff', '#e6f2ff', '#f5f5ff',
+      '#e8e8ff', '#fafafa', '#f0f0ff', '#ffffff',
+      '#fdfeff', '#f8fbff', '#ffffff', '#fcfeff'
+    ];
+    const snowShapes = ['❄️', '❅', '❆', '✻', '✼', '❄', '❋'];
+    
+    function createSnowParticle() {
+      if (self.activeWeatherParticles.length >= self.maxParticles) return;
+      
+      const particle = document.createElement('div');
+      particle.classList.add('weather-particle');
+      
+      const layerRandom = Math.random();
+      let layer, size, blur, speed, opacity;
+      
+      if (layerRandom < 0.35) {
+        layer = 'far';
+        size = 8 + Math.random() * 8;
+        blur = 4 + Math.random() * 2;
+        speed = 10000 + Math.random() * 5000;
+        opacity = 0.25 + Math.random() * 0.2;
+      } else if (layerRandom < 0.7) {
+        layer = 'mid';
+        size = 16 + Math.random() * 12;
+        blur = 1.5 + Math.random() * 1.5;
+        speed = 6000 + Math.random() * 3000;
+        opacity = 0.45 + Math.random() * 0.25;
+      } else {
+        layer = 'close';
+        size = 28 + Math.random() * 22;
+        blur = 0;
+        speed = 4000 + Math.random() * 2000;
+        opacity = 0.7 + Math.random() * 0.3;
+      }
+      
+      particle.classList.add(layer);
+      
+      const snowShape = snowShapes[Math.floor(Math.random() * snowShapes.length)];
+      const color = snowColors[Math.floor(Math.random() * snowColors.length)];
+      
+      particle.textContent = snowShape;
+      particle.style.fontSize = size + 'px';
+      particle.style.color = color;
+      particle.style.filter = `blur(${blur}px) drop-shadow(0 0 ${blur * 3}px rgba(200, 220, 255, 0.8))`;
+      particle.style.opacity = opacity;
+      
+      const startX = Math.random() * window.innerWidth;
+      particle.style.left = startX + 'px';
+      particle.style.top = '-100px';
+      
+      let baseDrift = (Math.random() - 0.5) * 300;
+      const rotationStart = Math.random() * 360;
+      const rotationEnd = rotationStart + (Math.random() * 240 - 120);
+      
+      document.body.appendChild(particle);
+      self.activeWeatherParticles.push(particle);
+      
+      const particleData = {
+        element: particle,
+        startX: startX,
+        baseDrift: baseDrift,
+        speed: speed,
+        startTime: Date.now(),
+        layer: layer
+      };
+      
+      self.animateSnowParticle(particleData, rotationStart, rotationEnd, opacity, size);
+    }
+    
+    function spawnLoop() {
+      if (self.currentWeather === 'love-snow') {
+        createSnowParticle();
+        
+        const nextSpawn = 150 + Math.random() * 250;
+        const timeoutId = setTimeout(spawnLoop, nextSpawn);
+        self.weatherAnimationFrames.push(timeoutId);
+      }
+    }
+    
+    spawnLoop();
+  },
+  
+  // === DAY/NIGHT CYCLE SYSTEM ===
+  startDayNightCycle: function() {
+    const self = this;
+    const cycleTime = 300000; // 5 minutes total cycle
+    const phases = ['sunrise', 'day', 'sunset', 'night'];
+    let currentPhaseIndex = 1; // Start at day
+    
+    function changePhase() {
+      if (self.currentWeather !== 'love-snow') return;
+      
+      const phase = phases[currentPhaseIndex];
+      self.currentTimeOfDay = phase;
+      
+      // Remove all time classes
+      document.body.classList.remove('time-sunrise', 'time-day', 'time-sunset', 'time-night');
+      
+      // Add current phase class
+      document.body.classList.add(`time-${phase}`);
+      
+      console.log(`🌅 Time changed to: ${phase}`);
+      
+      // Handle aurora (only at night)
+      if (phase === 'night') {
+        self.showAurora();
+      } else if (phase === 'sunrise') {
+        self.hideAurora();
+      }
+      
+      // Move to next phase
+      currentPhaseIndex = (currentPhaseIndex + 1) % phases.length;
+    }
+    
+    // Set initial phase
+    document.body.classList.add('time-day');
+    
+    // Change phase every 75 seconds (5 minutes / 4 phases)
+    self.dayNightCycleInterval = setInterval(changePhase, 75000);
+  },
+  
+  // === AURORA BOREALIS SYSTEM ===
+  showAurora: function() {
+    if (this.auroraContainer) return;
+    
+    console.log('✨ Northern Lights appearing...');
+    
+    this.auroraContainer = document.createElement('div');
+    this.auroraContainer.className = 'aurora-container';
+    
+    // Create 3 aurora wave layers
+    for (let i = 0; i < 3; i++) {
+      const wave = document.createElement('div');
+      wave.className = 'aurora-wave';
+      this.auroraContainer.appendChild(wave);
+    }
+    
+    document.body.appendChild(this.auroraContainer);
+    
+    // Fade in aurora
+    setTimeout(() => {
+      this.auroraContainer.classList.add('active');
+    }, 100);
+  },
+  
+  hideAurora: function() {
+    if (!this.auroraContainer) return;
+    
+    console.log('✨ Northern Lights fading...');
+    
+    this.auroraContainer.classList.remove('active');
+    
+    setTimeout(() => {
+      if (this.auroraContainer && this.auroraContainer.parentNode) {
+        this.auroraContainer.remove();
+        this.auroraContainer = null;
+      }
+    }, 5000);
+  },
+  
+  // === BLIZZARD SYSTEM ===
+  scheduleBlizzard: function() {
+    const self = this;
+    
+    function scheduleNext() {
+      if (self.currentWeather !== 'love-snow') return;
+      
+      // Random time between 2-5 minutes
+      const nextBlizzard = 120000 + Math.random() * 180000;
+      console.log(`❄️ Next blizzard in ${Math.round(nextBlizzard/1000)} seconds`);
+      
+      self.blizzardInterval = setTimeout(() => {
+        self.startBlizzard();
+        scheduleNext();
+      }, nextBlizzard);
+    }
+    
+    scheduleNext();
+  },
+  
+  startBlizzard: function() {
+    if (this.isBlizzardActive) return;
+    
+    console.log('🌨️ BLIZZARD STARTING!');
+    this.isBlizzardActive = true;
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'blizzard-overlay active';
+    overlay.id = 'blizzard-overlay';
+    document.body.appendChild(overlay);
+    
+    // Screen shake
+    document.body.classList.add('blizzard-active');
+    
+    // Create intense snow particles
+    const particleCount = 300;
+    for (let i = 0; i < particleCount; i++) {
+      setTimeout(() => {
+        this.createBlizzardParticle(overlay);
+      }, i * 10);
+    }
+    
+    // Check if Santa is on screen during blizzard
+    if (this.currentSantaSleigh) {
+      setTimeout(() => {
+        if (this.currentSantaSleigh && this.currentSantaSleigh.parentNode) {
+          console.log('🎅 Santa getting blown away by blizzard!');
+          this.currentSantaSleigh.classList.remove('active');
+          this.currentSantaSleigh.classList.add('blown-away');
+          
+          setTimeout(() => {
+            if (this.currentSantaSleigh && this.currentSantaSleigh.parentNode) {
+              this.currentSantaSleigh.remove();
+              this.currentSantaSleigh = null;
+            }
+          }, 2000);
+        }
+      }, 1000);
+    }
+    
+    // Remove Christmas tree lights
+    if (this.currentChristmasTree) {
+      this.currentChristmasTree.classList.remove('christmas-tree');
+      this.currentChristmasTree.querySelectorAll('.tree-light').forEach(light => light.remove());
+      this.currentChristmasTree = null;
+    }
+    
+    // Blizzard lasts 8-12 seconds
+    const duration = 8000 + Math.random() * 4000;
+    setTimeout(() => {
+      this.stopBlizzard();
+      
+      // Select new Christmas tree after blizzard
+      setTimeout(() => {
+        this.selectChristmasTree();
+      }, 2000);
+    }, duration);
+  },
+  
+  stopBlizzard: function() {
+    if (!this.isBlizzardActive) return;
+    
+    console.log('🌨️ Blizzard ending...');
+    this.isBlizzardActive = false;
+    
+    const overlay = document.getElementById('blizzard-overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+      setTimeout(() => {
+        overlay.remove();
+      }, 500);
+    }
+    
+    document.body.classList.remove('blizzard-active');
+  },
+  
+  createBlizzardParticle: function(container) {
+    const particle = document.createElement('div');
+    particle.className = 'blizzard-particle';
+    
+    const size = 3 + Math.random() * 6;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    
+    // Start from left side, moving right
+    particle.style.left = '-20px';
+    particle.style.top = Math.random() * 100 + '%';
+    
+    const duration = 0.8 + Math.random() * 1.2;
+    const endX = window.innerWidth + Math.random() * 200;
+    const endY = (Math.random() - 0.5) * 100;
+    
+    particle.style.transition = `all ${duration}s linear`;
+    container.appendChild(particle);
+    
+    requestAnimationFrame(() => {
+      particle.style.left = endX + 'px';
+      particle.style.top = `calc(${particle.style.top} + ${endY}px)`;
+      particle.style.opacity = '0';
+    });
+    
+    setTimeout(() => {
+      particle.remove();
+    }, duration * 1000);
+  },
+  
+  // === PINE TREES SYSTEM ===
+  createPineTrees: function() {
+    const treeCount = 15 + Math.floor(Math.random() * 10);
+    
+    for (let i = 0; i < treeCount; i++) {
+      const tree = this.createPineTree();
+      
+      // Position on mountains
+      const leftPos = Math.random() * 100;
+      const bottomPos = 5 + Math.random() * 25;
+      const scale = 0.6 + Math.random() * 0.8;
+      
+      tree.style.left = leftPos + '%';
+      tree.style.bottom = bottomPos + '%';
+      tree.style.transform = `scale(${scale})`;
+      tree.style.zIndex = Math.floor(bottomPos);
+      
+      // Add slight blur for depth
+      if (bottomPos > 20) {
+        tree.style.filter = 'blur(0px)';
+      } else if (bottomPos > 15) {
+        tree.style.filter = 'blur(1px)';
+      } else {
+        tree.style.filter = 'blur(2px)';
+      }
+      
+      this.alpineScene.appendChild(tree);
+      this.pineTrees.push(tree);
+    }
+    
+    // Select one tree to be Christmas tree
+    setTimeout(() => {
+      this.selectChristmasTree();
+    }, 3000);
+  },
+  
+  createPineTree: function() {
+    const tree = document.createElement('div');
+    tree.className = 'pine-tree sway';
+    
+    const trunk = document.createElement('div');
+    trunk.className = 'tree-trunk';
+    
+    const foliage = document.createElement('div');
+    foliage.className = 'tree-foliage';
+    
+    // Create 3 layers of foliage
+    for (let i = 0; i < 3; i++) {
+      const layer = document.createElement('div');
+      layer.className = 'tree-layer';
+      foliage.appendChild(layer);
+    }
+    
+    tree.appendChild(foliage);
+    tree.appendChild(trunk);
+    
+    return tree;
+  },
+  
+  selectChristmasTree: function() {
+    if (this.pineTrees.length === 0) return;
+    if (this.currentChristmasTree) return;
+    
+    // Select random tree
+    const randomIndex = Math.floor(Math.random() * this.pineTrees.length);
+    const selectedTree = this.pineTrees[randomIndex];
+    
+    selectedTree.classList.add('christmas-tree');
+    this.currentChristmasTree = selectedTree;
+    
+    console.log('🎄 Christmas tree selected!');
+    
+    // Add lights
+    const lightPositions = [
+      { top: '10px', left: '20px' },
+      { top: '25px', left: '15px' },
+      { top: '25px', left: '35px' },
+      { top: '40px', left: '10px' },
+      { top: '40px', left: '30px' },
+      { top: '40px', left: '45px' },
+      { top: '55px', left: '5px' },
+      { top: '55px', left: '25px' },
+      { top: '55px', left: '50px' }
+    ];
+    
+    lightPositions.forEach(pos => {
+      const light = document.createElement('div');
+      light.className = 'tree-light';
+      light.style.top = pos.top;
+      light.style.left = pos.left;
+      selectedTree.querySelector('.tree-foliage').appendChild(light);
+    });
+  },
+  
+  // === CABIN SYSTEM ===
+  createCabin: function() {
+    this.cabinContainer = document.createElement('div');
+    this.cabinContainer.className = 'cabin-container';
+    
+    // Create cabin image
+    const cabinImg = document.createElement('img');
+    cabinImg.src = 'assets/cabin.png';
+    cabinImg.alt = 'Mountain Cabin';
+    cabinImg.className = 'cabin-img';
+    cabinImg.style.imageRendering = 'crisp-edges';
+    
+    // Window glow
+    const windowGlow = document.createElement('div');
+    windowGlow.className = 'cabin-window-glow';
+    
+    // Chimney smoke (3 puffs)
+    for (let i = 0; i < 3; i++) {
+      const smoke = document.createElement('div');
+      smoke.className = 'cabin-smoke';
+      this.cabinContainer.appendChild(smoke);
+    }
+    
+    this.cabinContainer.appendChild(cabinImg);
+    this.cabinContainer.appendChild(windowGlow);
+    
+    this.alpineScene.appendChild(this.cabinContainer);
+    
+    console.log('🏠 Cozy cabin created!');
+  },/* ========================================
    WEATHER SYSTEM MODULE
    Handles all weather effects: heart rain, love snow, etc.
    ======================================== */
@@ -165,6 +596,39 @@ const WeatherSystem = {
     }
     document.querySelectorAll('.santa-sleigh').forEach(s => s.remove());
     document.querySelectorAll('.gift-particle').forEach(g => g.remove());
+    this.currentSantaSleigh = null;
+    
+    // Stop day/night cycle
+    if (this.dayNightCycleInterval) {
+      clearInterval(this.dayNightCycleInterval);
+      this.dayNightCycleInterval = null;
+    }
+    
+    // Remove aurora
+    if (this.auroraContainer) {
+      this.auroraContainer.remove();
+      this.auroraContainer = null;
+    }
+    
+    // Stop blizzards
+    if (this.blizzardInterval) {
+      clearTimeout(this.blizzardInterval);
+      this.blizzardInterval = null;
+    }
+    this.stopBlizzard();
+    
+    // Remove pine trees
+    this.pineTrees.forEach(tree => tree.remove());
+    this.pineTrees = [];
+    this.currentChristmasTree = null;
+    
+    // Remove cabin
+    if (this.cabinContainer) {
+      this.cabinContainer.remove();
+      this.cabinContainer = null;
+    }
+    
+    document.body.classList.remove('blizzard-active');
     
     this.activeWeatherParticles.forEach(particle => {
       if (particle && particle.parentNode) {
@@ -910,9 +1374,14 @@ const WeatherSystem = {
       </div>
     `;
     
+    // Get sleigh position - gifts drop from the SLEIGH, not reindeers
     const sleighRect = sleigh.getBoundingClientRect();
-    gift.style.left = (sleighRect.left + 40) + 'px';
-    gift.style.top = (sleighRect.top + 20) + 'px';
+    const sleighImg = sleigh.querySelector('.sleigh-img');
+    const sleighImgRect = sleighImg ? sleighImg.getBoundingClientRect() : sleighRect;
+    
+    // Drop from center of sleigh
+    gift.style.left = (sleighImgRect.left + sleighImgRect.width / 2) + 'px';
+    gift.style.top = (sleighImgRect.bottom) + 'px';
     
     const driftX = (Math.random() - 0.5) * 100;
     gift.style.setProperty('--fall-x', driftX + 'px');
