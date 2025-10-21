@@ -23,33 +23,8 @@ body.bg-heart-rain {
   background-size: 400% 400%;
 }
 
-/* ========================================
-   LOVE SNOW - DAY/NIGHT CYCLE BACKGROUNDS
-   ======================================== */
-
 body.bg-love-snow {
   background: linear-gradient(-45deg, #e3f2fd, #b39ddb, #f8f9fa, #e1bee7, #e3f2fd);
-  background-size: 400% 400%;
-  transition: background 3s ease;
-}
-
-body.bg-love-snow.time-sunrise {
-  background: linear-gradient(-45deg, #FFB88C, #FFA07A, #87CEEB, #B0C4DE, #FFB88C);
-  background-size: 400% 400%;
-}
-
-body.bg-love-snow.time-day {
-  background: linear-gradient(-45deg, #87CEEB, #B0E0E6, #E0F6FF, #ADD8E6, #87CEEB);
-  background-size: 400% 400%;
-}
-
-body.bg-love-snow.time-sunset {
-  background: linear-gradient(-45deg, #FF6B6B, #FFA07A, #4A5568, #6B7280, #FF6B6B);
-  background-size: 400% 400%;
-}
-
-body.bg-love-snow.time-night {
-  background: linear-gradient(-45deg, #0f0c29, #1a1a2e, #16213e, #0a0e27, #0f0c29);
   background-size: 400% 400%;
 }
 
@@ -296,112 +271,80 @@ body.bg-clear-sky {
 }
 
 /* ========================================
-   SANTA SLEIGH SYSTEM WITH PNG IMAGES
+   SANTA SLEIGH SYSTEM
    ======================================== */
 
 .santa-sleigh {
   position: fixed;
-  left: -120px;
-  top: 5%;
+  left: -150px;
+  top: 10%;
   z-index: 100;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.8s ease;
-  filter: blur(3px) brightness(0.7) contrast(0.8);
+  transition: opacity 0.5s ease;
+  filter: blur(1px) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
   display: flex;
   align-items: center;
-  gap: 10px;
-  transform: scale(0.6);
+  gap: 15px;
 }
 
 .santa-sleigh.active {
-  opacity: 0.6;
-  animation: sleighFlyNatural 30s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+  opacity: 0.85;
+  animation: sleighFlyNatural 25s linear forwards;
 }
 
 @keyframes sleighFlyNatural {
   0% {
-    left: -120px;
-    top: 5%;
-    transform: scale(0.6) rotate(0deg);
-  }
-  8% {
-    top: 12%;
-    transform: scale(0.6) rotate(3deg);
-  }
-  18% {
-    top: 4%;
-    transform: scale(0.6) rotate(-2deg);
-  }
-  28% {
-    top: 15%;
-    transform: scale(0.6) rotate(4deg);
-  }
-  35% {
+    left: -150px;
     top: 8%;
-    transform: scale(0.6) rotate(-1deg);
   }
-  45% {
-    top: 18%;
-    transform: scale(0.6) rotate(5deg);
+  15% {
+    top: 12%;
+  }
+  25% {
+    top: 6%;
+  }
+  40% {
+    top: 15%;
   }
   52% {
-    top: 7%;
-    transform: scale(0.6) rotate(-3deg);
+    top: 10%;
   }
-  62% {
-    top: 16%;
-    transform: scale(0.6) rotate(2deg);
+  68% {
+    top: 18%;
   }
-  72% {
+  80% {
+    top: 12%;
+  }
+  90% {
     top: 9%;
-    transform: scale(0.6) rotate(-2deg);
-  }
-  82% {
-    top: 14%;
-    transform: scale(0.6) rotate(3deg);
-  }
-  92% {
-    top: 6%;
-    transform: scale(0.6) rotate(-1deg);
   }
   100% {
-    left: calc(100vw + 120px);
-    top: 11%;
-    transform: scale(0.6) rotate(1deg);
+    left: calc(100vw + 150px);
+    top: 14%;
   }
 }
 
 .reindeer-img {
-  width: 60px;
+  width: 50px;
   height: auto;
-  animation: reindeerFloat 1.2s ease-in-out infinite alternate;
-  filter: brightness(0.8);
+  animation: reindeerFloat 0.8s ease-in-out infinite alternate;
 }
 
 @keyframes reindeerFloat {
-  from { 
-    transform: translateY(0px) rotate(-1deg); 
-  }
-  to { 
-    transform: translateY(-8px) rotate(1deg); 
-  }
+  from { transform: translateY(0px); }
+  to { transform: translateY(-6px); }
 }
 
 .sleigh-img {
-  width: 70px;
+  width: 60px;
   height: auto;
-  animation: sleighBounce 1.2s ease-in-out infinite alternate;
-  filter: brightness(0.8);
+  animation: sleighBounce 0.8s ease-in-out infinite alternate;
 }
 
 @keyframes sleighBounce {
-  from { 
-    transform: translateY(0px) rotate(-3deg); 
-  }
-  to { 
-    transform: translateY(-6px) rotate(1deg); 
-  }
+  from { transform: translateY(0px) rotate(-2deg); }
+  to { transform: translateY(-4px) rotate(2deg); }
 }
 
 /* ========================================
