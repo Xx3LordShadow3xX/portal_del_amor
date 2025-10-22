@@ -41,56 +41,70 @@ const WeatherSystem = {
   },
   
   attachEventListeners: function() {
-    this.weatherBtn.addEventListener('click', () => {
-      this.isWeatherMenuOpen = !this.isWeatherMenuOpen;
-      
-      if (this.isWeatherMenuOpen) {
-        this.weatherMenu.classList.add('active');
-      } else {
-        this.weatherMenu.classList.remove('active');
-      }
-      
-      this.weatherBtn.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        this.weatherBtn.style.transform = '';
-      }, 150);
-    });
+  const self = this;
+  
+  // Weather button click - STOP PROPAGATION
+  this.weatherBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent document click from firing
+    self.isWeatherMenuOpen = !self.isWeatherMenuOpen;
     
-    document.addEventListener('click', (e) => {
-      if (this.isWeatherMenuOpen && 
-          !this.weatherMenu.contains(e.target) && 
-          !this.weatherBtn.contains(e.target)) {
-        this.weatherMenu.classList.remove('active');
-        this.isWeatherMenuOpen = false;
-      }
-    });
+    if (self.isWeatherMenuOpen) {
+      self.weatherMenu.classList.add('active');
+    } else {
+      self.weatherMenu.classList.remove('active');
+    }
     
-    const weatherOptions = document.querySelectorAll('.weather-option');
-    weatherOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        const weatherType = option.dataset.weather;
-        
-        weatherOptions.forEach(opt => {
-          opt.classList.remove('selected');
-          if (weatherType === 'clear-sky') {
-            opt.classList.add('dimmed');
-          } else {
-            opt.classList.remove('dimmed');
-          }
-        });
-        
-        option.classList.add('selected');
-        option.classList.remove('dimmed');
-        
-        this.currentWeather = weatherType;
-        
-        const icon = option.querySelector('.weather-icon').textContent;
-        this.weatherBtn.textContent = icon;
-        
-        this.applyWeatherEffect(weatherType);
+    self.weatherBtn.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      self.weatherBtn.style.transform = '';
+    }, 150);
+  });
+  
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (self.isWeatherMenuOpen && 
+        !self.weatherMenu.contains(e.target) && 
+        !self.weatherBtn.contains(e.target)) {
+      self.weatherMenu.classList.remove('active');
+      self.isWeatherMenuOpen = false;
+    }
+  });
+  
+  // Weather option selection
+  const weatherOptions = document.querySelectorAll('.weather-option');
+  weatherOptions.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent menu from closing immediately
+      
+      const weatherType = option.dataset.weather;
+      
+      weatherOptions.forEach(opt => {
+        opt.classList.remove('selected');
+        if (weatherType === 'clear-sky') {
+          opt.classList.add('dimmed');
+        } else {
+          opt.classList.remove('dimmed');
+        }
       });
+      
+      option.classList.add('selected');
+      option.classList.remove('dimmed');
+      
+      self.currentWeather = weatherType;
+      
+      const icon = option.querySelector('.weather-icon').textContent;
+      self.weatherBtn.textContent = icon;
+      
+      console.log('🌈 Weather changed to:', weatherType);
+      
+      self.applyWeatherEffect(weatherType);
+      
+      // Close menu after selection
+      self.weatherMenu.classList.remove('active');
+      self.isWeatherMenuOpen = false;
     });
-  },
+  });
+},
   
   createBackgroundStar: function() {
     if (this.currentWeather !== 'clear-sky') return;
