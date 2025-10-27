@@ -1,17 +1,24 @@
 /* ========================================
    MAIN APPLICATION
+   Handles initialization, event listeners, and UI interactions
    ======================================== */
 
+// Wait for DOM to load
 window.addEventListener('load', () => {
+  // Hide loading screen after 2 seconds
   setTimeout(() => {
     document.getElementById('loader').classList.add('hidden');
   }, 2000);
   
+  // Initialize all systems
   initializeApp();
 });
 
+// Initialize application
 function initializeApp() {
+  // Get all DOM elements
   const elements = {
+    // Music player elements
     playBtn: document.getElementById('playBtn'),
     prevBtn: document.getElementById('prevBtn'),
     nextBtn: document.getElementById('nextBtn'),
@@ -21,14 +28,19 @@ function initializeApp() {
     sequenceBtn: document.getElementById('sequenceBtn'),
     bgMusic: document.getElementById('bgMusic'),
     songTitle: document.getElementById('songTitle'),
+    
+    // Weather system elements
     weatherBtn: document.getElementById('weatherBtn'),
     weatherMenu: document.getElementById('weatherMenu'),
     cloudLayer: document.getElementById('cloudLayer'),
     rainBackground: document.getElementById('rainBackground'),
     alpineScene: document.getElementById('alpineScene'),
+    
+    // Other elements
     heartButton: document.getElementById('heartButton')
   };
   
+  // Initialize music player
   MusicPlayer.init({
     playBtn: elements.playBtn,
     prevBtn: elements.prevBtn,
@@ -41,6 +53,7 @@ function initializeApp() {
     songTitle: elements.songTitle
   });
   
+  // Initialize weather system
   WeatherSystem.init({
     weatherBtn: elements.weatherBtn,
     weatherMenu: elements.weatherMenu,
@@ -49,18 +62,24 @@ function initializeApp() {
     alpineScene: elements.alpineScene
   });
   
+  // Setup heart button
   setupHeartButton(elements.heartButton);
+  
+  // Setup mouse trail
   setupMouseTrail();
 }
 
+// Setup heart button functionality
 function setupHeartButton(heartButton) {
   const heartTypes = ['❤️', '💕', '💞', '💓', '💗', '💖', '💘', '💙', '💜', '🧡'];
   
   heartButton.addEventListener('click', () => {
+    // Create falling hearts
     for (let i = 0; i < 15; i++) {
       setTimeout(() => createHeart(heartTypes), i * 80);
     }
     
+    // Button feedback animation
     heartButton.style.transform = 'scale(0.95)';
     setTimeout(() => {
       heartButton.style.transform = '';
@@ -68,6 +87,7 @@ function setupHeartButton(heartButton) {
   });
 }
 
+// Create falling heart
 function createHeart(heartTypes) {
   const heart = document.createElement('div');
   heart.classList.add('heart');
@@ -86,6 +106,7 @@ function createHeart(heartTypes) {
   }, 4000);
 }
 
+// Setup mouse trail hearts
 function setupMouseTrail() {
   document.addEventListener('mousemove', (e) => {
     const trailHeart = document.createElement('div');
