@@ -1,1 +1,331 @@
+/* ========================================
+   LOVE SNOW WEATHER
+   Snowfall with alpine scene and Santa sleigh
+   ======================================== */
 
+/* Background gradient for love snow */
+body.bg-love-snow {
+  background: linear-gradient(-45deg, #e3f2fd, #b39ddb, #f8f9fa, #e1bee7, #e3f2fd);
+  background-size: 400% 400%;
+}
+
+/* ========================================
+   SNOW BACKGROUND PARTICLES
+   ======================================== */
+
+.snow-bg-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: rainFall linear infinite;
+  filter: blur(1px);
+  opacity: 0.5;
+}
+
+/* ========================================
+   ALPINE SCENE
+   ======================================== */
+
+.alpine-scene {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.alpine-scene.active {
+  opacity: 1;
+}
+
+/* Mountain Layers */
+.mountain {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-left: 150px solid transparent;
+  border-right: 150px solid transparent;
+}
+
+.mountain-back {
+  border-bottom: 250px solid rgba(140, 150, 170, 0.4);
+  z-index: 1;
+  filter: blur(12px);
+  opacity: 0.5;
+}
+
+.mountain-mid {
+  border-bottom: 300px solid rgba(160, 170, 190, 0.5);
+  z-index: 2;
+  filter: blur(8px);
+  opacity: 0.65;
+}
+
+.mountain-front {
+  border-bottom: 350px solid rgba(180, 190, 210, 0.6);
+  z-index: 3;
+  filter: blur(4px);
+  opacity: 0.75;
+}
+
+.snow-cap {
+  position: absolute;
+  top: -140px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 80px solid transparent;
+  border-right: 80px solid transparent;
+  border-bottom: 120px solid rgba(255, 255, 255, 0.85);
+  filter: blur(2px);
+}
+
+/* Mountain Fog */
+.mountain-fog {
+  position: absolute;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  border-radius: 100%;
+  filter: blur(25px);
+  animation: cloudDrift linear infinite;
+}
+
+/* ========================================
+   SANTA SLEIGH SYSTEM
+   ======================================== */
+
+.santa-sleigh {
+  position: fixed;
+  left: -150px;
+  top: 10%;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  filter: blur(1px) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.santa-sleigh.active {
+  opacity: 0.85;
+  animation: sleighFlyNatural 25s linear forwards;
+}
+
+@keyframes sleighFlyNatural {
+  0% {
+    left: -150px;
+    top: 8%;
+  }
+  15% {
+    top: 12%;
+  }
+  25% {
+    top: 6%;
+  }
+  40% {
+    top: 15%;
+  }
+  52% {
+    top: 10%;
+  }
+  68% {
+    top: 18%;
+  }
+  80% {
+    top: 12%;
+  }
+  90% {
+    top: 9%;
+  }
+  100% {
+    left: calc(100vw + 150px);
+    top: 14%;
+  }
+}
+
+.reindeer-img {
+  width: 50px;
+  height: auto;
+  animation: reindeerFloat 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes reindeerFloat {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-6px); }
+}
+
+.sleigh-img {
+  width: 60px;
+  height: auto;
+  animation: sleighBounce 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes sleighBounce {
+  from { transform: translateY(0px) rotate(-2deg); }
+  to { transform: translateY(-4px) rotate(2deg); }
+}
+
+/* ========================================
+   GIFT PARTICLES
+   ======================================== */
+
+.gift-particle {
+  position: fixed;
+  z-index: 99;
+  pointer-events: none;
+}
+
+@keyframes giftFall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100vh - 50px)) translateX(var(--fall-x)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.gift-box {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.gift-ribbon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 4px;
+  background: #FFD700;
+}
+
+.gift-ribbon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  width: 100%;
+  height: 4px;
+  background: #FFD700;
+}
+
+.gift-ribbon::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 8px solid #FFD700;
+}
+
+/* ========================================
+   REINDEER & SLEIGH COMPONENTS (CSS-only version)
+   ======================================== */
+
+.reindeer {
+  position: absolute;
+  width: 40px;
+  height: 30px;
+}
+
+.reindeer-body {
+  width: 100%;
+  height: 100%;
+  background: rgba(139, 90, 43, 0.7);
+  border-radius: 15px 5px 5px 15px;
+  position: relative;
+}
+
+.reindeer-head {
+  position: absolute;
+  left: -10px;
+  top: 2px;
+  width: 15px;
+  height: 15px;
+  background: rgba(139, 90, 43, 0.7);
+  border-radius: 50%;
+}
+
+.reindeer-antler {
+  position: absolute;
+  top: -8px;
+  width: 2px;
+  height: 8px;
+  background: rgba(101, 67, 33, 0.7);
+}
+
+.reindeer-antler.left {
+  left: 3px;
+}
+
+.reindeer-antler.right {
+  right: 3px;
+}
+
+.reindeer-leg {
+  position: absolute;
+  bottom: -10px;
+  width: 3px;
+  height: 10px;
+  background: rgba(139, 90, 43, 0.7);
+}
+
+.sleigh-body {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  background: rgba(200, 0, 0, 0.7);
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sleigh-runner {
+  position: absolute;
+  bottom: -5px;
+  left: 5px;
+  width: 40px;
+  height: 3px;
+  background: rgba(218, 165, 32, 0.8);
+  border-radius: 2px;
+}
+
+.santa-figure {
+  position: absolute;
+  top: -15px;
+  left: 15px;
+  width: 15px;
+  height: 15px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+}
+
+.santa-hat {
+  position: absolute;
+  top: -8px;
+  left: 2px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid rgba(200, 0, 0, 0.8);
+}
