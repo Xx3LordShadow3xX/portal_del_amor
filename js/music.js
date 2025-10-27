@@ -3,7 +3,9 @@
    Handles playlist, playback, shuffle/sequence modes
    ======================================== */
 
+// Music Player State
 const MusicPlayer = {
+  // DOM Elements (will be set in main.js)
   playBtn: null,
   prevBtn: null,
   nextBtn: null,
@@ -14,11 +16,13 @@ const MusicPlayer = {
   bgMusic: null,
   songTitle: null,
   
+  // State
   musicPlaying: false,
   currentSongIndex: 0,
   isShuffleMode: false,
   playedSongs: [],
   
+  // Playlist
   playlist: [
     { title: "A Donde Vamos - Morat", src: "songs/A_Donde_Vamos_-_Morat.mp3" },
     { title: "Niña Bonita - Dstance", src: "songs/Niña_Bonita_-_Dstance.mp3" },
@@ -37,6 +41,7 @@ const MusicPlayer = {
     { title: "Si Estoy Contigo - Camilo", src: "songs/Si_estoy_contigo_-_Camilo.mp3" }
   ],
   
+  // Initialize music player
   init: function(elements) {
     this.playBtn = elements.playBtn;
     this.prevBtn = elements.prevBtn;
@@ -52,10 +57,12 @@ const MusicPlayer = {
     this.attachEventListeners();
   },
   
+  // Update song title display
   updateSongTitle: function() {
     this.songTitle.textContent = this.playlist[this.currentSongIndex].title;
   },
   
+  // Get next song based on mode
   getNextSong: function() {
     if (this.isShuffleMode) {
       if (this.playedSongs.length >= this.playlist.length) {
@@ -77,6 +84,7 @@ const MusicPlayer = {
     }
   },
   
+  // Get previous song based on mode
   getPreviousSong: function() {
     if (this.isShuffleMode) {
       if (this.playedSongs.length > 1) {
@@ -88,104 +96,117 @@ const MusicPlayer = {
     }
   },
   
+  // Play current song
   playSong: function() {
-    const self = this;
-    
     this.playBtn.textContent = '⏸';
     this.musicPlaying = true;
     
-    const currentSrc = this.playlist[this.currentSongIndex].src;
-    const needsNewSource = !this.bgMusic.src || !this.bgMusic.src.includes(currentSrc);
-    
-    if (needsNewSource) {
-      this.bgMusic.src = currentSrc;
-      this.bgMusic.load();
+    if (!this.bgMusic.src || !this.bgMusic.src.includes(this.playlist[this.currentSongIndex].src)) {
+      this.bgMusic.src = this.playlist[this.currentSongIndex].src;
     }
     
-    const playPromise = this.bgMusic.play();
-    
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        console.log('✅ Music playing');
-      }).catch(error => {
-        console.error('❌ Play error:', error);
-        self.playBtn.textContent = '▶︎';
-        self.musicPlaying = false;
-      });
-    }
+    this.bgMusic.play().then(() => {
+      console.log('Music started playing successfully');
+    }).catch(error => {
+      console.error('Error playing music:', error);
+      alert('Error playing music: ' + error.message);
+      this.playBtn.textContent = '▶︎';
+      this.musicPlaying = false;
+    });
   },
   
+  // Pause current song
   pauseSong: function() {
-    this.bgMusic.pause();
+    const fadeOut = setInterval(() => {
+      if (this.bgMusic.volume > 0.05) {
+        this.bgMusic.volume -= 0.05;
+      } else {
+        this.bgMusic.volume = 0;
+        this.bgMusic.pause();
+        this.bgMusic.volume = 1;
+        clearInterval(fadeOut);
+      }
+    }, 20);
+    
     this.playBtn.textContent = '▶︎';
     this.musicPlaying = false;
   },
   
+  // Attach event listeners
   attachEventListeners: function() {
-    const self = this;
-    
+    // Play/Pause button
     this.playBtn.addEventListener('click', () => {
-      if (self.musicPlaying) {
-        self.pauseSong();
+      if (this.musicPlaying) {
+        this.pauseSong();
       } else {
-        self.playSong();
+        this.playSong();
       }
     });
     
+    // Previous button
     this.prevBtn.addEventListener('click', () => {
-      self.getPreviousSong();
-      self.updateSongTitle();
-      self.bgMusic.src = self.playlist[self.currentSongIndex].src;
-      self.bgMusic.load();
-      self.bgMusic.play().then(() => {
-        self.playBtn.textContent = '⏸';
-        self.musicPlaying = true;
+      this.getPreviousSong();
+      this.updateSongTitle();
+      this.bgMusic.src = this.playlist[this.currentSongIndex].src;
+      this.bgMusic.play().then(() => {
+        this.playBtn.textContent = '⏸';
+        this.musicPlaying = true;
+      }).catch(error => {
+        console.error('Error playing music:', error);
       });
     });
     
+    // Next button
     this.nextBtn.addEventListener('click', () => {
-      self.getNextSong();
-      self.updateSongTitle();
-      self.bgMusic.src = self.playlist[self.currentSongIndex].src;
-      self.bgMusic.load();
-      self.bgMusic.play().then(() => {
-        self.playBtn.textContent = '⏸';
-        self.musicPlaying = true;
+      this.getNextSong();
+      this.updateSongTitle();
+      this.bgMusic.src = this.playlist[this.currentSongIndex].src;
+      this.bgMusic.play().then(() => {
+        this.playBtn.textContent = '⏸';
+        this.musicPlaying = true;
+      }).catch(error => {
+        console.error('Error playing music:', error);
       });
     });
     
+    // Shuffle button
     this.shuffleBtn.addEventListener('click', () => {
-      if (!self.isShuffleMode) {
-        self.isShuffleMode = true;
-        self.playedSongs = [self.currentSongIndex];
-        self.shuffleBtn.classList.add('active');
-        self.sequenceBtn.classList.remove('active');
+      if (!this.isShuffleMode) {
+        this.isShuffleMode = true;
+        this.playedSongs = [this.currentSongIndex];
+        this.shuffleBtn.classList.add('active');
+        this.sequenceBtn.classList.remove('active');
       }
     });
     
+    // Sequence button
     this.sequenceBtn.addEventListener('click', () => {
-      if (self.isShuffleMode) {
-        self.isShuffleMode = false;
-        self.playedSongs = [];
-        self.shuffleBtn.classList.remove('active');
-        self.sequenceBtn.classList.add('active');
+      if (this.isShuffleMode) {
+        this.isShuffleMode = false;
+        this.playedSongs = [];
+        this.shuffleBtn.classList.remove('active');
+        this.sequenceBtn.classList.add('active');
       }
     });
     
+    // Rewind 15 seconds
     this.rewindBtn.addEventListener('click', () => {
-      self.bgMusic.currentTime = Math.max(0, self.bgMusic.currentTime - 15);
+      this.bgMusic.currentTime = Math.max(0, this.bgMusic.currentTime - 15);
     });
     
+    // Forward 15 seconds
     this.forwardBtn.addEventListener('click', () => {
-      self.bgMusic.currentTime = Math.min(self.bgMusic.duration, self.bgMusic.currentTime + 15);
+      this.bgMusic.currentTime = Math.min(this.bgMusic.duration, this.bgMusic.currentTime + 15);
     });
     
+    // Auto-play next song when current song ends
     this.bgMusic.addEventListener('ended', () => {
-      self.getNextSong();
-      self.updateSongTitle();
-      self.bgMusic.src = self.playlist[self.currentSongIndex].src;
-      self.bgMusic.load();
-      self.bgMusic.play();
+      this.getNextSong();
+      this.updateSongTitle();
+      this.bgMusic.src = this.playlist[this.currentSongIndex].src;
+      this.bgMusic.play().catch(error => {
+        console.error('Error playing next song:', error);
+      });
     });
   }
 };
