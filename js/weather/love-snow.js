@@ -135,11 +135,11 @@ const LoveSnow = {
     }
   },
   
-  // Create alpine scene
+  // Create alpine scene with FIXED mountain peaks
   createAlpineScene: function() {
     this.alpineScene.innerHTML = '';
     
-    console.log('Creating Alpine Scene');
+    console.log('Creating Alpine Scene with fixed mountain peaks');
     
     const mountainPositions = [
       { type: 'back', left: '5%' },
@@ -159,6 +159,7 @@ const LoveSnow = {
       mountain.classList.add('mountain', `mountain-${pos.type}`);
       mountain.style.left = pos.left;
       
+      // Add snow caps ONLY to back and mid mountains
       if (pos.type === 'back' || pos.type === 'mid') {
         const snowCap = document.createElement('div');
         snowCap.classList.add('snow-cap');
@@ -168,6 +169,7 @@ const LoveSnow = {
       this.alpineScene.appendChild(mountain);
     });
     
+    // Create mountain fog
     const fogCount = 8;
     for (let i = 0; i < fogCount; i++) {
       const fog = document.createElement('div');
@@ -372,55 +374,25 @@ const LoveSnow = {
     self.shared.windGustInterval = setTimeout(createGust, 3000);
   },
   
-  // Santa sleigh system
+  // Santa sleigh system with PNG assets
   startSantaSleighSystem: function() {
     const self = this;
     
     function spawnSleigh() {
       if (!document.body.classList.contains('bg-love-snow')) return;
       
-      console.log('Spawning Santa sleigh!');
+      console.log('🎅 Spawning Santa sleigh with PNG assets!');
       
       const sleigh = document.createElement('div');
       sleigh.classList.add('santa-sleigh');
       
+      // Order: Sleigh at position 0, then 3 reindeers
+      // flex-direction: row-reverse makes visual order: (reindeer3)(reindeer2)(reindeer1)(sleigh)
       sleigh.innerHTML = `
-        <div class="reindeer" style="left: -60px;">
-          <div class="reindeer-body">
-            <div class="reindeer-head">
-              <div class="reindeer-antler left"></div>
-              <div class="reindeer-antler right"></div>
-            </div>
-            <div class="reindeer-leg" style="left: 5px;"></div>
-            <div class="reindeer-leg" style="right: 5px;"></div>
-          </div>
-        </div>
-        <div class="reindeer" style="left: -90px; top: -10px;">
-          <div class="reindeer-body">
-            <div class="reindeer-head">
-              <div class="reindeer-antler left"></div>
-              <div class="reindeer-antler right"></div>
-            </div>
-            <div class="reindeer-leg" style="left: 5px;"></div>
-            <div class="reindeer-leg" style="right: 5px;"></div>
-          </div>
-        </div>
-        <div class="reindeer" style="left: -120px; top: -5px;">
-          <div class="reindeer-body">
-            <div class="reindeer-head">
-              <div class="reindeer-antler left"></div>
-              <div class="reindeer-antler right"></div>
-            </div>
-            <div class="reindeer-leg" style="left: 5px;"></div>
-            <div class="reindeer-leg" style="right: 5px;"></div>
-          </div>
-        </div>
-        <div class="sleigh-body">
-          <div class="sleigh-runner"></div>
-          <div class="santa-figure">
-            <div class="santa-hat"></div>
-          </div>
-        </div>
+        <img src="assets/santa-sleigh.png" alt="Santa Sleigh" class="sleigh-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
       `;
       
       document.body.appendChild(sleigh);
@@ -429,28 +401,32 @@ const LoveSnow = {
         sleigh.classList.add('active');
       }, 100);
       
+      // Gift dropping from sleigh (not reindeers)
       let giftDropCount = 0;
       const giftInterval = setInterval(() => {
-        if (giftDropCount < 5 && document.body.classList.contains('bg-love-snow')) {
+        if (giftDropCount < 6 && document.body.classList.contains('bg-love-snow')) {
           self.dropGift(sleigh);
           giftDropCount++;
         } else {
           clearInterval(giftInterval);
         }
-      }, 4000);
+      }, 5000);
       
+      // Remove sleigh after animation completes
       setTimeout(() => {
         sleigh.remove();
-      }, 25000);
+      }, 35000);
       
+      // Schedule next Santa appearance
       const nextSpawn = 60000 + Math.random() * 60000;
       self.santaSleighInterval = setTimeout(spawnSleigh, nextSpawn);
     }
     
-    self.santaSleighInterval = setTimeout(spawnSleigh, 5000);
+    // First Santa appears 12 seconds after Love Snow starts
+    self.santaSleighInterval = setTimeout(spawnSleigh, 12000);
   },
   
-  // Drop gift from sleigh
+  // Drop gift from sleigh (gifts drop from SLEIGH position, not reindeer)
   dropGift: function(sleigh) {
     const gift = document.createElement('div');
     gift.classList.add('gift-particle');
@@ -461,9 +437,13 @@ const LoveSnow = {
       </div>
     `;
     
-    const sleighRect = sleigh.getBoundingClientRect();
-    gift.style.left = (sleighRect.left + 40) + 'px';
-    gift.style.top = (sleighRect.top + 20) + 'px';
+    // Get sleigh position (first child is sleigh due to row-reverse)
+    const sleighElement = sleigh.querySelector('.sleigh-img');
+    const sleighRect = sleighElement.getBoundingClientRect();
+    
+    // Drop from center of sleigh
+    gift.style.left = (sleighRect.left + sleighRect.width / 2) + 'px';
+    gift.style.top = (sleighRect.top + sleighRect.height) + 'px';
     
     const driftX = (Math.random() - 0.5) * 100;
     gift.style.setProperty('--fall-x', driftX + 'px');
