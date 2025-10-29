@@ -10,19 +10,28 @@ A beautiful, romantic interactive website with music player and dynamic weather 
 ├─ README.md               # This file
 │
 ├─ /css/
-│   ├─ styles.css         # General page layout, typography, buttons, UI components
-│   └─ themes.css         # Weather themes, backgrounds, particle effects, animations
+│   ├─ styles.css          # General page layout, typography, buttons, UI components
+│   ├─ weather-base.css    # Base weather styles (shared particles, clouds, animations)
+│   ├─ themes.css          # Placeholder weather theme backgrounds
+│   └─ /weather/           # Individual weather-specific styles
+│       ├─ clear-sky.css   # Clear sky styles (stars)
+│       ├─ heart-rain.css  # Heart rain styles (rain streaks, splash effects)
+│       └─ love-snow.css   # Love snow styles (alpine scene, Santa, gifts)
 │
 ├─ /js/
-│   ├─ main.js            # Main application initialization and UI event handlers
-│   ├─ music.js           # Music player system (playlist, controls, shuffle/sequence)
-│   └─ weather.js         # Weather system (heart rain, love snow, clouds, particles)
+│   ├─ main.js             # Main application initialization and UI event handlers
+│   ├─ music.js            # Music player system (playlist, controls, shuffle/sequence)
+│   ├─ weather-core.js     # Weather system coordinator (manages all weather modules)
+│   └─ /weather/           # Individual weather modules
+│       ├─ clear-sky.js    # Clear sky weather logic (twinkling stars)
+│       ├─ heart-rain.js   # Heart rain weather logic (falling hearts, wind, splash)
+│       └─ love-snow.js    # Love snow weather logic (snowfall, alpine scene, Santa)
 │
 ├─ /songs/
-│   └─ (MP3 files)        # Music playlist files
+│   └─ (MP3 files)         # Music playlist files
 │
 └─ /assets/ (optional)
-    └─ (Images, icons)    # Additional media resources
+    └─ (Images, icons)     # Additional media resources
 ```
 
 ## 🎵 Features
@@ -74,19 +83,18 @@ playlist: [
 ```
 
 ### Changing Colors
-Edit the gradient backgrounds in `css/themes.css`:
-
-```css
-body.bg-your-theme {
-  background: linear-gradient(-45deg, #color1, #color2, #color3, #color4, #color1);
-  background-size: 400% 400%;
-}
-```
+Edit the gradient backgrounds in individual weather CSS files:
+- Clear Sky: `css/weather/clear-sky.css`
+- Heart Rain: `css/weather/heart-rain.css`
+- Love Snow: `css/weather/love-snow.css`
 
 ### Adjusting Weather Effects
-Modify particle settings in `js/weather.js`:
-- `maxParticles`: Maximum number of particles on screen
-- Particle sizes, speeds, and colors in respective weather functions
+Modify particle settings in individual weather JS modules:
+- Clear Sky: `js/weather/clear-sky.js`
+- Heart Rain: `js/weather/heart-rain.js`
+- Love Snow: `js/weather/love-snow.js`
+
+Each module has its own `start()` and `stop()` functions for clean weather transitions.
 
 ## 🔧 Technical Details
 
@@ -97,17 +105,35 @@ Modify particle settings in `js/weather.js`:
 - Handles DOM element references
 - Sets up UI interactions (heart button, mouse trail)
 
-**music.js** - Music player module
+**music.js** - Music player module (standalone)
 - Manages playlist and playback state
 - Handles all music controls
 - Implements shuffle/sequence logic
 - Auto-advances to next track
 
-**weather.js** - Weather system module
-- Controls weather effects and animations
-- Manages particle systems
-- Handles wind simulation
-- Controls background layers (clouds, rain, mountains)
+**weather-core.js** - Weather system coordinator
+- Manages weather menu and button interactions
+- Coordinates weather transitions
+- Maintains shared state (particles, wind, etc.)
+- Delegates to individual weather modules
+
+**weather/clear-sky.js** - Clear sky weather module
+- Spawns twinkling stars
+- Manages star animation lifecycle
+
+**weather/heart-rain.js** - Heart rain weather module
+- Creates falling heart particles with 3 depth layers
+- Implements wind gust system
+- Generates rain streak background
+- Creates cloud layer
+- Handles splash effects on landing
+
+**weather/love-snow.js** - Love snow weather module
+- Creates snowfall particles with 3 depth layers
+- Builds alpine mountain scene
+- Spawns Santa sleigh with reindeers
+- Handles gift dropping from sleigh
+- Manages snow clouds and fog
 
 ### Key Functions
 
@@ -121,11 +147,18 @@ Modify particle settings in `js/weather.js`:
 #### Weather System
 - `WeatherSystem.init()` - Initialize weather system
 - `WeatherSystem.applyWeatherEffect()` - Switch weather themes
-- `WeatherSystem.startHeartRain()` - Heart rain effect
-- `WeatherSystem.startLoveSnow()` - Love snow effect
 - `WeatherSystem.stopAllWeather()` - Clean up all effects
-- `WeatherSystem.createClouds()` - Generate cloud layer
-- `WeatherSystem.startWindGustSystem()` - Wind simulation
+- `ClearSky.start()` / `ClearSky.stop()` - Start/stop clear sky
+- `HeartRain.start()` / `HeartRain.stop()` - Start/stop heart rain
+- `LoveSnow.start()` / `LoveSnow.stop()` - Start/stop love snow
+
+### Modular Design Benefits
+
+✅ **Separation of Concerns**: Each weather effect is self-contained  
+✅ **Easy to Extend**: Add new weather types by creating new modules  
+✅ **Maintainable**: Small, focused files instead of one large file  
+✅ **Clean Transitions**: Each module handles its own cleanup  
+✅ **Shared Resources**: Common state managed by weather-core
 
 ## 🌐 Browser Compatibility
 
@@ -150,26 +183,34 @@ Mobile optimizations include:
 
 ## 🎯 Future Enhancements
 
-Potential additions for remaining weather effects:
+### Remaining Weather Effects
+To implement new weather types, create:
+1. New CSS file in `css/weather/[name].css`
+2. New JS module in `js/weather/[name].js`
+3. Add background gradient to `css/themes.css`
+4. Update `weather-core.js` to call new module
+
+Potential weather effects:
 - **Rose Petals**: Falling rose petals with romantic pink theme
 - **Cherry Blossoms**: Sakura petals with spring aesthetic
 - **Starry Romance**: Night sky with shooting stars
 - **Sunny Bliss**: Warm sunshine with lens flare effects
 
-Additional features to consider:
+### Additional Features
 - Volume control slider
 - Progress bar for current song
 - Playlist display panel
-- Save weather preference to localStorage (if deployed outside Claude.ai)
 - Additional particle effects
 - Sound effects for weather changes
+- Day/night cycle for Love Snow (aurora borealis, blizzards)
 
 ## 💡 Tips
 
 1. **Music Files**: Ensure all MP3 files are in the correct folder with exact filenames
-2. **Performance**: Reduce `maxParticles` if experiencing lag
+2. **Performance**: Weather modules automatically limit particles to 50 max
 3. **Weather Menu**: Click weather button to open/close menu
 4. **Mobile**: Touch interactions work the same as mouse clicks
+5. **Module Loading**: Script order in `index.html` is critical - don't rearrange!
 
 ## 🐛 Troubleshooting
 
@@ -180,13 +221,19 @@ Additional features to consider:
 
 **Weather effects not showing:**
 - Check browser console for JavaScript errors
-- Ensure all JS files are loaded in correct order
-- Verify CSS files are properly linked
+- Verify all JS files are loaded in correct order
+- Ensure CSS files are properly linked
+- Check that weather modules are in correct folders
 
 **Performance issues:**
-- Reduce particle count in weather.js
+- Each weather module has built-in particle limits
 - Close other browser tabs
-- Disable weather effects temporarily
+- Temporarily switch to Clear Sky weather
+
+**Module errors:**
+- Ensure folder structure matches exactly: `js/weather/` and `css/weather/`
+- Verify all files are uploaded to correct locations
+- Check that old `js/weather.js` file is deleted
 
 ## 📄 License
 
@@ -197,6 +244,7 @@ This is a personal romantic project. Feel free to use and modify for personal pu
 - Font: Google Fonts (Dancing Script, Poppins)
 - Design: Custom glassmorphism and gradient animations
 - Music: Personal playlist selection
+- Architecture: Modular weather system for scalability
 
 ---
 
