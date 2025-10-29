@@ -53,7 +53,7 @@ function initializeApp() {
     songTitle: elements.songTitle
   });
   
-  // Initialize weather system
+  // Initialize weather system (now using weather-core.js)
   WeatherSystem.init({
     weatherBtn: elements.weatherBtn,
     weatherMenu: elements.weatherMenu,
