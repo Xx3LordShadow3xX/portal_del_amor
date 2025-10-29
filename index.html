@@ -8,9 +8,13 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   
-  <!-- CSS Files -->
+  <!-- CSS Files - ORDER MATTERS! -->
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/weather-base.css">
   <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/weather/clear-sky.css">
+  <link rel="stylesheet" href="css/weather/heart-rain.css">
+  <link rel="stylesheet" href="css/weather/love-snow.css">
 </head>
 <body>
   <!-- Loading Screen -->
@@ -95,9 +99,19 @@
     </div>
   </div>
 
-  <!-- JavaScript Files (in order of dependency) -->
+  <!-- JavaScript Files - ORDER MATTERS! -->
+  <!-- Load music player (standalone) -->
   <script src="js/music.js"></script>
-  <script src="js/weather.js"></script>
+  
+  <!-- Load individual weather modules FIRST -->
+  <script src="js/weather/clear-sky.js"></script>
+  <script src="js/weather/heart-rain.js"></script>
+  <script src="js/weather/love-snow.js"></script>
+  
+  <!-- Load weather core (uses weather modules) -->
+  <script src="js/weather-core.js"></script>
+  
+  <!-- Load main initialization (uses everything) -->
   <script src="js/main.js"></script>
 </body>
 </html>
