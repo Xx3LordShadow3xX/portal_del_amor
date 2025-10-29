@@ -386,13 +386,13 @@ const LoveSnow = {
       const sleigh = document.createElement('div');
       sleigh.classList.add('santa-sleigh');
       
-      // Order: Sleigh at position 0, then 3 reindeers
-      // flex-direction: row-reverse makes visual order: (reindeer3)(reindeer2)(reindeer1)(sleigh)
+      // Order: Reindeers FIRST, then Sleigh (front to back visual order)
+      // Visual result: (Reindeer 1)(Reindeer 2)(Reindeer 3)(Sleigh)
       sleigh.innerHTML = `
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
         <img src="assets/santa-sleigh.png" alt="Santa Sleigh" class="sleigh-img">
-        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
-        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
-        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
       `;
       
       document.body.appendChild(sleigh);
