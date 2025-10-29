@@ -44,7 +44,7 @@ body.bg-love-snow {
   opacity: 1;
 }
 
-/* Mountain Layers */
+/* Mountain Layers - Gray bases with proper blur */
 .mountain {
   position: absolute;
   bottom: 0;
@@ -54,6 +54,7 @@ body.bg-love-snow {
   border-right: 150px solid transparent;
 }
 
+/* Back mountains - most blurred, pushed back */
 .mountain-back {
   border-bottom: 250px solid rgba(140, 150, 170, 0.4);
   z-index: 1;
@@ -61,6 +62,7 @@ body.bg-love-snow {
   opacity: 0.5;
 }
 
+/* Mid mountains - medium blur */
 .mountain-mid {
   border-bottom: 300px solid rgba(160, 170, 190, 0.5);
   z-index: 2;
@@ -68,6 +70,7 @@ body.bg-love-snow {
   opacity: 0.65;
 }
 
+/* Front mountains - slight blur */
 .mountain-front {
   border-bottom: 350px solid rgba(180, 190, 210, 0.6);
   z-index: 3;
@@ -75,9 +78,10 @@ body.bg-love-snow {
   opacity: 0.75;
 }
 
+/* Snow caps - properly positioned ON TOP of mountains */
 .snow-cap {
   position: absolute;
-  top: -140px;
+  top: -120px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
@@ -86,6 +90,7 @@ body.bg-love-snow {
   border-right: 80px solid transparent;
   border-bottom: 120px solid rgba(255, 255, 255, 0.85);
   filter: blur(2px);
+  z-index: 1;
 }
 
 /* Mountain Fog */
@@ -98,80 +103,163 @@ body.bg-love-snow {
 }
 
 /* ========================================
-   SANTA SLEIGH SYSTEM
+   SANTA SLEIGH SYSTEM - PNG BASED
    ======================================== */
 
 .santa-sleigh {
   position: fixed;
-  left: -150px;
+  left: -200px;
   top: 10%;
   z-index: 100;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.5s ease;
-  filter: blur(1px) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
+  transform: scale(0.5);
+  filter: blur(3px) brightness(0.7) contrast(0.8);
 }
 
 .santa-sleigh.active {
-  opacity: 0.85;
-  animation: sleighFlyNatural 25s linear forwards;
+  opacity: 0.65;
+  animation: sleighFlyNatural 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
 }
 
+/* Natural swooping flight path - NOT periodic */
 @keyframes sleighFlyNatural {
   0% {
-    left: -150px;
-    top: 8%;
+    left: -200px;
+    top: 5%;
+    transform: scale(0.5) rotate(-2deg);
   }
-  15% {
+  7% {
     top: 12%;
+    transform: scale(0.5) rotate(1deg);
   }
-  25% {
-    top: 6%;
+  14% {
+    top: 4%;
+    transform: scale(0.5) rotate(-3deg);
   }
-  40% {
+  21% {
     top: 15%;
+    transform: scale(0.5) rotate(2deg);
   }
-  52% {
-    top: 10%;
+  28% {
+    top: 8%;
+    transform: scale(0.5) rotate(-1deg);
   }
-  68% {
-    top: 18%;
+  35% {
+    top: 17%;
+    transform: scale(0.5) rotate(3deg);
   }
-  80% {
-    top: 12%;
+  42% {
+    top: 6%;
+    transform: scale(0.5) rotate(-2deg);
   }
-  90% {
+  49% {
+    top: 15%;
+    transform: scale(0.5) rotate(1deg);
+  }
+  56% {
     top: 9%;
+    transform: scale(0.5) rotate(-1deg);
+  }
+  63% {
+    top: 16%;
+    transform: scale(0.5) rotate(2deg);
+  }
+  70% {
+    top: 9%;
+    transform: scale(0.5) rotate(-2deg);
+  }
+  77% {
+    top: 13%;
+    transform: scale(0.5) rotate(1deg);
+  }
+  84% {
+    top: 7%;
+    transform: scale(0.5) rotate(-1deg);
+  }
+  92% {
+    top: 10%;
+    transform: scale(0.5) rotate(1deg);
   }
   100% {
-    left: calc(100vw + 150px);
+    left: calc(100vw + 200px);
     top: 14%;
+    transform: scale(0.5) rotate(0deg);
   }
 }
 
-.reindeer-img {
-  width: 50px;
-  height: auto;
-  animation: reindeerFloat 0.8s ease-in-out infinite alternate;
-}
-
-@keyframes reindeerFloat {
-  from { transform: translateY(0px); }
-  to { transform: translateY(-6px); }
-}
-
+/* Sleigh image */
 .sleigh-img {
-  width: 60px;
+  width: 80px;
   height: auto;
-  animation: sleighBounce 0.8s ease-in-out infinite alternate;
+  animation: sleighBounce 1.4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 @keyframes sleighBounce {
-  from { transform: translateY(0px) rotate(-2deg); }
-  to { transform: translateY(-4px) rotate(2deg); }
+  from { 
+    transform: translateY(0px) rotate(-2deg); 
+  }
+  to { 
+    transform: translateY(-7px) rotate(2deg); 
+  }
+}
+
+/* Reindeer images - each with independent float */
+.reindeer-img {
+  width: 55px;
+  height: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Reindeer 1 (front/lead) */
+.reindeer-img:nth-child(3) {
+  animation: reindeerFloat1 1.3s ease-in-out infinite alternate;
+  animation-delay: 0s;
+}
+
+@keyframes reindeerFloat1 {
+  from { 
+    transform: translateY(0px) rotate(-1deg) translateX(0px); 
+  }
+  to { 
+    transform: translateY(-9px) rotate(2deg) translateX(3px); 
+  }
+}
+
+/* Reindeer 2 (middle) */
+.reindeer-img:nth-child(2) {
+  animation: reindeerFloat2 1.5s ease-in-out infinite alternate;
+  animation-delay: -0.3s;
+}
+
+@keyframes reindeerFloat2 {
+  from { 
+    transform: translateY(-2px) rotate(1deg) translateX(0px); 
+  }
+  to { 
+    transform: translateY(-11px) rotate(-2deg) translateX(-3px); 
+  }
+}
+
+/* Reindeer 3 (back/closest to sleigh) */
+.reindeer-img:nth-child(1) {
+  animation: reindeerFloat3 1.4s ease-in-out infinite alternate;
+  animation-delay: -0.6s;
+}
+
+@keyframes reindeerFloat3 {
+  from { 
+    transform: translateY(-1px) rotate(-2deg) translateX(0px); 
+  }
+  to { 
+    transform: translateY(-10px) rotate(1deg) translateX(2px); 
+  }
 }
 
 /* ========================================
@@ -236,96 +324,4 @@ body.bg-love-snow {
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   border-bottom: 8px solid #FFD700;
-}
-
-/* ========================================
-   REINDEER & SLEIGH COMPONENTS (CSS-only version)
-   ======================================== */
-
-.reindeer {
-  position: absolute;
-  width: 40px;
-  height: 30px;
-}
-
-.reindeer-body {
-  width: 100%;
-  height: 100%;
-  background: rgba(139, 90, 43, 0.7);
-  border-radius: 15px 5px 5px 15px;
-  position: relative;
-}
-
-.reindeer-head {
-  position: absolute;
-  left: -10px;
-  top: 2px;
-  width: 15px;
-  height: 15px;
-  background: rgba(139, 90, 43, 0.7);
-  border-radius: 50%;
-}
-
-.reindeer-antler {
-  position: absolute;
-  top: -8px;
-  width: 2px;
-  height: 8px;
-  background: rgba(101, 67, 33, 0.7);
-}
-
-.reindeer-antler.left {
-  left: 3px;
-}
-
-.reindeer-antler.right {
-  right: 3px;
-}
-
-.reindeer-leg {
-  position: absolute;
-  bottom: -10px;
-  width: 3px;
-  height: 10px;
-  background: rgba(139, 90, 43, 0.7);
-}
-
-.sleigh-body {
-  position: relative;
-  width: 50px;
-  height: 30px;
-  background: rgba(200, 0, 0, 0.7);
-  border-radius: 10px 10px 0 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.sleigh-runner {
-  position: absolute;
-  bottom: -5px;
-  left: 5px;
-  width: 40px;
-  height: 3px;
-  background: rgba(218, 165, 32, 0.8);
-  border-radius: 2px;
-}
-
-.santa-figure {
-  position: absolute;
-  top: -15px;
-  left: 15px;
-  width: 15px;
-  height: 15px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 50%;
-}
-
-.santa-hat {
-  position: absolute;
-  top: -8px;
-  left: 2px;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 10px solid rgba(200, 0, 0, 0.8);
 }
