@@ -62,12 +62,20 @@ body.bg-love-snow {
   opacity: 0.5;
 }
 
+.mountain-back .snow-cap {
+  top: -250px;
+}
+
 /* Mid mountains - medium blur */
 .mountain-mid {
   border-bottom: 300px solid rgba(160, 170, 190, 0.5);
   z-index: 2;
   filter: blur(8px);
   opacity: 0.65;
+}
+
+.mountain-mid .snow-cap {
+  top: -300px;
 }
 
 /* Front mountains - slight blur */
@@ -81,23 +89,27 @@ body.bg-love-snow {
 /* Snow caps - SMALLER white triangle on top of gray peak */
 .snow-cap {
   position: absolute;
+  top: -250px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 75px solid rgba(255, 255, 255, 0.9);
   filter: blur(3px);
   z-index: 2;
 }
 
 .mountain-back .snow-cap {
-  top: -175px;
+  top: -250px;
   border-left: 45px solid transparent;
   border-right: 45px solid transparent;
   border-bottom: 70px solid rgba(255, 255, 255, 0.85);
 }
 
 .mountain-mid .snow-cap {
-  top: -215px;
+  top: -300px;
   border-left: 55px solid transparent;
   border-right: 55px solid transparent;
   border-bottom: 85px solid rgba(255, 255, 255, 0.9);
