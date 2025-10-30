@@ -62,12 +62,20 @@ body.bg-love-snow {
   opacity: 0.5;
 }
 
+.mountain-back .snow-cap {
+  top: -250px;
+}
+
 /* Mid mountains - medium blur */
 .mountain-mid {
   border-bottom: 300px solid rgba(160, 170, 190, 0.5);
   z-index: 2;
   filter: blur(8px);
   opacity: 0.65;
+}
+
+.mountain-mid .snow-cap {
+  top: -300px;
 }
 
 /* Front mountains - slight blur */
@@ -78,17 +86,17 @@ body.bg-love-snow {
   opacity: 0.75;
 }
 
-/* Snow caps - properly positioned ON TOP of mountains - FIXED ALIGNMENT */
+/* Snow caps - properly positioned ON TOP of mountains - MATHEMATICALLY CORRECT */
 .snow-cap {
   position: absolute;
-  top: -119px;
+  top: -250px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 79px solid transparent;
-  border-right: 79px solid transparent;
-  border-bottom: 119px solid rgba(255, 255, 255, 0.85);
+  border-left: 80px solid transparent;
+  border-right: 80px solid transparent;
+  border-bottom: 120px solid rgba(255, 255, 255, 0.85);
   filter: blur(2px);
   z-index: 1;
 }
@@ -218,6 +226,8 @@ body.bg-love-snow {
   height: auto;
   animation: sleighBounce 1.4s ease-in-out infinite alternate;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes sleighBounce {
@@ -234,6 +244,8 @@ body.bg-love-snow {
   width: 55px;
   height: auto;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  position: relative;
+  z-index: 2;
 }
 
 /* Reindeer 1 (front/lead) - first child */
