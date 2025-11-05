@@ -9,6 +9,11 @@ const LoveSnow = {
   rainBackground: null,
   alpineScene: null,
   santaSleighInterval: null,
+  dayNightInterval: null,
+  auroraContainer: null,
+  currentPhaseIndex: 1, // Start at day
+  
+  phases: ['sunrise', 'day', 'sunset', 'night'],
   
   snowColors: [
     '#ffffff', '#f0f8ff', '#e6f2ff', '#f5f5ff',
@@ -29,6 +34,12 @@ const LoveSnow = {
     // Setup alpine scene
     this.alpineScene.classList.add('active');
     this.createAlpineScene();
+    
+    // Setup aurora container
+    this.createAuroraContainer();
+    
+    // Start day/night cycle
+    this.startDayNightCycle();
     
     // Setup clouds
     this.cloudLayer.style.display = 'block';
@@ -52,6 +63,21 @@ const LoveSnow = {
   // Stop love snow weather
   stop: function(sharedState, cloudLayer, rainBackground, alpineScene) {
     console.log('Love Snow weather stopped');
+    
+    // Stop day/night cycle
+    if (this.dayNightInterval) {
+      clearInterval(this.dayNightInterval);
+      this.dayNightInterval = null;
+    }
+    
+    // Remove aurora
+    if (this.auroraContainer) {
+      this.auroraContainer.remove();
+      this.auroraContainer = null;
+    }
+    
+    // Remove time classes
+    document.body.classList.remove('time-sunrise', 'time-day', 'time-sunset', 'time-night');
     
     if (this.santaSleighInterval) {
       clearTimeout(this.santaSleighInterval);
@@ -386,19 +412,21 @@ const LoveSnow = {
       const sleigh = document.createElement('div');
       sleigh.classList.add('santa-sleigh');
       
-      // Order: Reindeers FIRST, then Sleigh (front to back visual order)
-      // Visual result: (Reindeer 1)(Reindeer 2)(Reindeer 3)(Sleigh)
+      // Order: Sleigh FIRST, then Reindeers
+      // With flex-direction: row-reverse, visual order becomes: (Santa)(Reindeer)(Reindeer)(Reindeer)
       sleigh.innerHTML = `
-        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
-        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
-        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
         <img src="assets/santa-sleigh.png" alt="Santa Sleigh" class="sleigh-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
+        <img src="assets/reindeer.png" alt="Reindeer" class="reindeer-img">
       `;
       
       document.body.appendChild(sleigh);
       
+      // Small delay to ensure it's in DOM before activating
       setTimeout(() => {
         sleigh.classList.add('active');
+        console.log('✅ Santa activated and flying!');
       }, 100);
       
       // Gift dropping from sleigh (not reindeers)
@@ -414,15 +442,18 @@ const LoveSnow = {
       
       // Remove sleigh after animation completes
       setTimeout(() => {
+        console.log('🎅 Santa leaving screen...');
         sleigh.remove();
-      }, 35000);
+      }, 36000);
       
       // Schedule next Santa appearance
       const nextSpawn = 60000 + Math.random() * 60000;
+      console.log(`⏰ Next Santa in ${Math.round(nextSpawn/1000)} seconds`);
       self.santaSleighInterval = setTimeout(spawnSleigh, nextSpawn);
     }
     
     // First Santa appears 12 seconds after Love Snow starts
+    console.log('⏰ Santa will appear in 12 seconds...');
     self.santaSleighInterval = setTimeout(spawnSleigh, 12000);
   },
   
@@ -437,7 +468,7 @@ const LoveSnow = {
       </div>
     `;
     
-    // Get sleigh position (first child is sleigh due to row-reverse)
+    // Get sleigh position (first child is sleigh)
     const sleighElement = sleigh.querySelector('.sleigh-img');
     const sleighRect = sleighElement.getBoundingClientRect();
     
@@ -455,5 +486,67 @@ const LoveSnow = {
     setTimeout(() => {
       gift.remove();
     }, 4000);
+  },
+  
+  // ========================================
+  // DAY/NIGHT CYCLE SYSTEM
+  // ========================================
+  
+  createAuroraContainer: function() {
+    this.auroraContainer = document.createElement('div');
+    this.auroraContainer.classList.add('aurora-container');
+    
+    // Create 3 aurora wave layers
+    for (let i = 1; i <= 3; i++) {
+      const wave = document.createElement('div');
+      wave.classList.add('aurora-wave', `aurora-wave-${i}`);
+      this.auroraContainer.appendChild(wave);
+    }
+    
+    document.body.appendChild(this.auroraContainer);
+  },
+  
+  startDayNightCycle: function() {
+    const self = this;
+    
+    // Start at day
+    document.body.classList.add('time-day');
+    console.log('🌅 Starting Day/Night Cycle - Current: DAY');
+    
+    // Change phase every 75 seconds (5 minutes = 300s / 4 phases)
+    this.dayNightInterval = setInterval(() => {
+      self.changePhase();
+    }, 75000);
+  },
+  
+  changePhase: function() {
+    const currentPhase = this.phases[this.currentPhaseIndex];
+    
+    // Remove all time classes
+    document.body.classList.remove('time-sunrise', 'time-day', 'time-sunset', 'time-night');
+    
+    // Move to next phase
+    this.currentPhaseIndex = (this.currentPhaseIndex + 1) % 4;
+    const newPhase = this.phases[this.currentPhaseIndex];
+    
+    // Add new phase class
+    document.body.classList.add(`time-${newPhase}`);
+    
+    console.log(`🌅 Time changed to: ${newPhase.toUpperCase()}`);
+    
+    // Handle aurora visibility
+    if (newPhase === 'night') {
+      // Show aurora during night
+      if (this.auroraContainer) {
+        this.auroraContainer.classList.add('active');
+        console.log('✨ Aurora Borealis appearing...');
+      }
+    } else if (newPhase === 'sunrise') {
+      // Hide aurora at sunrise
+      if (this.auroraContainer) {
+        this.auroraContainer.classList.remove('active');
+        console.log('🌅 Aurora Borealis fading...');
+      }
+    }
   }
 };
