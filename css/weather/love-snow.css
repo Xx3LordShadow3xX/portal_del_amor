@@ -90,14 +90,14 @@ body.bg-love-snow {
 }
 
 .mountain-back .snow-cap {
-  top: -160px !important;
+  top: -120px !important;
   border-left: 50px solid transparent !important;
   border-right: 50px solid transparent !important;
   border-bottom: 80px solid rgba(255, 255, 255, 0.9) !important;
 }
 
 .mountain-mid .snow-cap {
-  top: -195px !important;
+  top: -120px !important;
   border-left: 60px solid transparent !important;
   border-right: 60px solid transparent !important;
   border-bottom: 95px solid rgba(255, 255, 255, 0.95) !important;
