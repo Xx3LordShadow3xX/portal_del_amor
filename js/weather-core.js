@@ -107,6 +107,7 @@ const WeatherSystem = {
     ClearSky.stop();
     HeartRain.stop(this.shared, this.cloudLayer, this.rainBackground);
     LoveSnow.stop(this.shared, this.cloudLayer, this.rainBackground, this.alpineScene);
+    RosePetals.stop(this.shared, this.cloudLayer, this.rainBackground);
     
     // Clear shared state
     this.shared.weatherAnimationFrames.forEach(id => {
@@ -153,6 +154,9 @@ const WeatherSystem = {
         break;
       case 'love-snow':
         LoveSnow.start(this.shared, this.cloudLayer, this.rainBackground, this.alpineScene);
+        break;
+      case 'rose-petals':
+        RosePetals.start(this.shared, this.cloudLayer, this.rainBackground);
         break;
       case 'clear-sky':
         ClearSky.start(this.shared);
