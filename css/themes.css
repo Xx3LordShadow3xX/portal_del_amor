@@ -1,0 +1,28 @@
+/* ========================================
+   WEATHER THEME BACKGROUNDS
+   Placeholder backgrounds for future weather types
+   ======================================== */
+
+/* Rose Petals - Placeholder */
+body.bg-rose-petals {
+  background: linear-gradient(-45deg, #ff6b9d, #ffa07a, #ffcccb, #ff9aa2, #ff6b9d);
+  background-size: 400% 400%;
+}
+
+/* Cherry Blossoms - Placeholder */
+body.bg-cherry-blossoms {
+  background: linear-gradient(-45deg, #ffc0cb, #ffb7d5, #ffe4e9, #ffd4e5, #ffc0cb);
+  background-size: 400% 400%;
+}
+
+/* Starry Romance - Placeholder */
+body.bg-starry-romance {
+  background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e, #0f0c29);
+  background-size: 400% 400%;
+}
+
+/* Sunny Bliss - Placeholder */
+body.bg-sunny-bliss {
+  background: linear-gradient(-45deg, #ffd93d, #ffa500, #ff6b9d, #ffb347, #ffd93d);
+  background-size: 400% 400%;
+}

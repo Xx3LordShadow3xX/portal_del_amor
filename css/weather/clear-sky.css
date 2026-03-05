@@ -1,0 +1,11 @@
+/* ========================================
+   CLEAR SKY WEATHER
+   Uses the default animated rainbow gradient from weather-base.css.
+   Star particle styles (.bg-star, @keyframes starTwinkle) are in styles.css.
+   No additional CSS is required for this weather type.
+   ======================================== */
+
+/* Explicit class rule — inherits animated gradient from weather-base.css */
+body.bg-clear-sky {
+  animation: gradientShift 8s ease infinite;
+}

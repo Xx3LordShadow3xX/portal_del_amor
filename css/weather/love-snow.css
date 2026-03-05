@@ -1,0 +1,683 @@
+/* ========================================
+   LOVE SNOW WEATHER
+   Snowfall with alpine scene and Santa sleigh
+   ======================================== */
+
+/* Background gradient for love snow */
+body.bg-love-snow {
+  background: linear-gradient(-45deg, #e3f2fd, #b39ddb, #f8f9fa, #e1bee7, #e3f2fd);
+  background-size: 400% 400%;
+}
+
+/* ========================================
+   SNOW BACKGROUND PARTICLES
+   ======================================== */
+
+.snow-bg-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: rainFall linear infinite;
+  filter: blur(1px);
+  opacity: 0.5;
+}
+
+/* ========================================
+   ALPINE SCENE
+   ======================================== */
+
+.alpine-scene {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.alpine-scene.active {
+  opacity: 1;
+}
+
+/* Mountain Layers - Gray bases with proper blur */
+.mountain {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-left: 150px solid transparent;
+  border-right: 150px solid transparent;
+}
+
+/* Back mountains - most blurred, pushed back */
+.mountain-back {
+  border-bottom: 250px solid rgba(140, 150, 170, 0.4);
+  z-index: 1;
+  filter: blur(12px);
+  opacity: 0.5;
+}
+
+/* Mid mountains - medium blur */
+.mountain-mid {
+  border-bottom: 300px solid rgba(160, 170, 190, 0.5);
+  z-index: 2;
+  filter: blur(8px);
+  opacity: 0.65;
+}
+
+/* Front mountains - slight blur */
+.mountain-front {
+  border-bottom: 350px solid rgba(180, 190, 210, 0.6);
+  z-index: 3;
+  filter: blur(4px);
+  opacity: 0.75;
+}
+
+/* Snow caps - white triangles sitting ON GRAY PEAKS */
+.snow-cap {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  filter: blur(3px);
+  z-index: 10;
+}
+
+.mountain-back .snow-cap {
+  top: 0px;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 80px solid rgba(255, 255, 255, 0.9);
+}
+
+.mountain-mid .snow-cap {
+  top: 0px;
+  border-left: 60px solid transparent;
+  border-right: 60px solid transparent;
+  border-bottom: 95px solid rgba(255, 255, 255, 0.95);
+}
+
+/* Mountain Fog */
+.mountain-fog {
+  position: absolute;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  border-radius: 100%;
+  filter: blur(25px);
+  animation: cloudDrift linear infinite;
+}
+
+/* ========================================
+   SANTA SLEIGH SYSTEM - ABSOLUTE POSITIONING
+   ======================================== */
+
+.santa-sleigh {
+  position: fixed;
+  left: -300px;
+  top: 10%;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  transform: scale(0.5);
+  filter: blur(3px) brightness(0.7) contrast(0.8);
+  width: 350px;
+  height: 80px;
+}
+
+.santa-sleigh.active {
+  opacity: 0.65;
+  animation: sleighFlyNatural 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+}
+
+/* Natural swooping flight path - TRULY RANDOM (big swoops, small dips, varied speeds) */
+@keyframes sleighFlyNatural {
+  0% {
+    left: -300px;
+    top: 8%;
+    transform: scale(0.5) rotate(-1deg);
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  4% {
+    top: 15%;
+    transform: scale(0.5) rotate(2deg);
+    animation-timing-function: cubic-bezier(0.65, 0.05, 0.36, 1);
+  }
+  9% {
+    top: 6%;
+    transform: scale(0.5) rotate(-3deg);
+    animation-timing-function: cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  }
+  12% {
+    top: 9%;
+    transform: scale(0.5) rotate(1deg);
+    animation-timing-function: cubic-bezier(0.33, 0.12, 0.68, 0.89);
+  }
+  17% {
+    top: 17%;
+    transform: scale(0.5) rotate(4deg);
+    animation-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+  23% {
+    top: 12%;
+    transform: scale(0.5) rotate(-1deg);
+    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  28% {
+    top: 5%;
+    transform: scale(0.5) rotate(-4deg);
+    animation-timing-function: cubic-bezier(0.39, 0.58, 0.57, 1);
+  }
+  34% {
+    top: 11%;
+    transform: scale(0.5) rotate(2deg);
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  }
+  39% {
+    top: 16%;
+    transform: scale(0.5) rotate(3deg);
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  43% {
+    top: 7%;
+    transform: scale(0.5) rotate(-2deg);
+    animation-timing-function: cubic-bezier(0.55, 0.09, 0.68, 0.53);
+  }
+  49% {
+    top: 14%;
+    transform: scale(0.5) rotate(1deg);
+    animation-timing-function: cubic-bezier(0.21, 0.61, 0.35, 1);
+  }
+  54% {
+    top: 4%;
+    transform: scale(0.5) rotate(-3deg);
+    animation-timing-function: cubic-bezier(0.65, 0.05, 0.36, 1);
+  }
+  59% {
+    top: 18%;
+    transform: scale(0.5) rotate(5deg);
+    animation-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+  64% {
+    top: 10%;
+    transform: scale(0.5) rotate(-1deg);
+    animation-timing-function: cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  }
+  69% {
+    top: 8%;
+    transform: scale(0.5) rotate(2deg);
+    animation-timing-function: cubic-bezier(0.39, 0.58, 0.57, 1);
+  }
+  73% {
+    top: 16%;
+    transform: scale(0.5) rotate(3deg);
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  78% {
+    top: 6%;
+    transform: scale(0.5) rotate(-4deg);
+    animation-timing-function: cubic-bezier(0.47, 0, 0.75, 0.72);
+  }
+  83% {
+    top: 13%;
+    transform: scale(0.5) rotate(1deg);
+    animation-timing-function: cubic-bezier(0.33, 0.12, 0.68, 0.89);
+  }
+  88% {
+    top: 9%;
+    transform: scale(0.5) rotate(-2deg);
+    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  93% {
+    top: 15%;
+    transform: scale(0.5) rotate(3deg);
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  }
+  97% {
+    top: 10%;
+    transform: scale(0.5) rotate(-1deg);
+    animation-timing-function: cubic-bezier(0.21, 0.61, 0.35, 1);
+  }
+  100% {
+    left: calc(100vw + 300px);
+    top: 12%;
+    transform: scale(0.5) rotate(0deg);
+  }
+}
+
+/* Sleigh image - AT THE BACK (left: 0) */
+.sleigh-img {
+  width: 80px;
+  height: auto;
+  animation: sleighBounce 1.4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+}
+
+@keyframes sleighBounce {
+  from { 
+    transform: translateY(0px) rotate(-2deg); 
+  }
+  to { 
+    transform: translateY(-7px) rotate(2deg); 
+  }
+}
+
+/* Reindeer images - IN FRONT (higher left values) */
+.reindeer-img {
+  width: 55px;
+  height: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  position: absolute;
+  top: 0px;
+  z-index: 2;
+}
+
+/* Reindeer 1 (closest to Santa) - second child in HTML */
+.reindeer-img:nth-child(2) {
+  left: 95px;
+  animation: reindeerFloat1 1.3s ease-in-out infinite alternate;
+  animation-delay: 0s;
+}
+
+@keyframes reindeerFloat1 {
+  from { 
+    transform: translateY(0px) rotate(-1deg) translateX(0px); 
+  }
+  to { 
+    transform: translateY(-9px) rotate(2deg) translateX(3px); 
+  }
+}
+
+/* Reindeer 2 (middle) - third child in HTML */
+.reindeer-img:nth-child(3) {
+  left: 165px;
+  animation: reindeerFloat2 1.5s ease-in-out infinite alternate;
+  animation-delay: -0.3s;
+}
+
+@keyframes reindeerFloat2 {
+  from { 
+    transform: translateY(-2px) rotate(1deg) translateX(0px); 
+  }
+  to { 
+    transform: translateY(-11px) rotate(-2deg) translateX(-3px); 
+  }
+}
+
+/* Reindeer 3 (lead/front) - fourth child in HTML */
+.reindeer-img:nth-child(4) {
+  left: 235px;
+  animation: reindeerFloat3 1.4s ease-in-out infinite alternate;
+  animation-delay: -0.6s;
+}
+
+@keyframes reindeerFloat3 {
+  from { 
+    transform: translateY(-1px) rotate(-2deg) translateX(0px); 
+  }
+  to { 
+    transform: translateY(-10px) rotate(1deg) translateX(2px); 
+  }
+}
+
+/* ========================================
+   GIFT PARTICLES
+   ======================================== */
+
+.gift-particle {
+  position: fixed;
+  z-index: 99;
+  pointer-events: none;
+}
+
+@keyframes giftFall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100vh - 50px)) translateX(var(--fall-x)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.gift-box {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.gift-ribbon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 4px;
+  background: #FFD700;
+}
+
+.gift-ribbon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  width: 100%;
+  height: 4px;
+  background: #FFD700;
+}
+
+.gift-ribbon::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 8px solid #FFD700;
+}
+
+/* ========================================
+   DAY / NIGHT SKY LAYERS
+   Two overlapping fixed divs that cross-fade to represent
+   Sunrise → Day → Sunset → Night (75 s per phase).
+   z-index: -1 places them above the body background but
+   behind all scene elements and the glass container.
+   ======================================== */
+
+.ls-sky-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 3s ease;
+  will-change: opacity;
+}
+
+/* ========================================
+   AURORA BOREALIS
+   Only visible during the Night phase.
+   mix-blend-mode: screen lets it glow over the dark sky.
+   ======================================== */
+
+.aurora-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 55%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 5s ease;
+  mix-blend-mode: screen;
+  overflow: hidden;
+}
+
+.aurora-container.visible {
+  opacity: 1;
+}
+
+.aurora-wave {
+  position: absolute;
+  width: 160%;
+  left: -30%;
+  border-radius: 60%;
+  filter: blur(30px);
+  will-change: transform;
+}
+
+.aurora-wave-1 {
+  height: 200px;
+  top: 5%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 140, 0.55) 20%,
+    rgba(0, 240, 200, 0.40) 50%,
+    rgba(0, 200, 255, 0.55) 80%,
+    transparent 100%
+  );
+  animation: auroraFlow1 35s ease-in-out infinite alternate;
+}
+
+.aurora-wave-2 {
+  height: 160px;
+  top: 28%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(160, 60, 240, 0.45) 30%,
+    rgba(100, 100, 255, 0.35) 60%,
+    transparent 100%
+  );
+  animation: auroraFlow2 48s ease-in-out infinite alternate;
+}
+
+.aurora-wave-3 {
+  height: 180px;
+  top: 12%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(50, 140, 255, 0.40) 25%,
+    rgba(0, 220, 245, 0.50) 65%,
+    transparent 100%
+  );
+  animation: auroraFlow3 55s ease-in-out infinite alternate;
+}
+
+@keyframes auroraFlow1 {
+  0%   { transform: translateX(0)    translateY(0)    scaleY(1.00); }
+  30%  { transform: translateX(-8%)  translateY(3%)   scaleY(1.10); }
+  60%  { transform: translateX(6%)   translateY(-2%)  scaleY(0.92); }
+  100% { transform: translateX(-5%)  translateY(5%)   scaleY(1.08); }
+}
+
+@keyframes auroraFlow2 {
+  0%   { transform: translateX(10%)  translateY(0)    scaleY(0.95); }
+  40%  { transform: translateX(-10%) translateY(-3%)  scaleY(1.10); }
+  100% { transform: translateX(5%)   translateY(4%)   scaleY(0.90); }
+}
+
+@keyframes auroraFlow3 {
+  0%   { transform: translateX(-5%)  translateY(2%)   scaleY(1.05); }
+  50%  { transform: translateX(8%)   translateY(-2%)  scaleY(0.95); }
+  100% { transform: translateX(-8%)  translateY(3%)   scaleY(1.10); }
+}
+
+/* ========================================
+   PINE FOREST
+   CSS clip-path triangles stacked to form stylised pine trees.
+   ::after pseudo-element adds a snow cap to each foliage layer.
+   ======================================== */
+
+.pine-tree {
+  position: absolute;
+  bottom: 0;
+  width: 110px;    /* Must hold the widest foliage layer */
+  height: 165px;   /* Enough for lights positioned at bottom: 148px */
+  transform-origin: center bottom;
+  transform: scale(var(--tree-scale, 1));
+  animation: treeWave var(--sway-dur, 5s) var(--sway-off, 0s) ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes treeWave {
+  0%   { transform: scale(var(--tree-scale, 1)) rotate(-1.5deg); }
+  100% { transform: scale(var(--tree-scale, 1)) rotate( 1.5deg); }
+}
+
+.pine-trunk {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 11px;
+  height: 30px;
+  background: linear-gradient(to right, #3d2007, #6b3a12, #3d2007);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Each foliage layer: rectangle clipped to an upward-pointing triangle */
+.pine-layer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Snow cap: the top ~30% of each triangle rendered white via ::after */
+.pine-layer::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(228, 243, 255, 0.84);
+  clip-path: polygon(50% 0%, 65% 32%, 35% 32%);
+}
+
+/* Layer sizes and vertical positions */
+.pine-layer-3 { width: 110px; height: 70px; bottom: 26px; background: var(--f-dark,  #163d22); }
+.pine-layer-2 { width: 82px;  height: 64px; bottom: 67px; background: var(--f-mid,   #1e5631); }
+.pine-layer-1 { width: 54px;  height: 54px; bottom: 99px; background: var(--f-light, #266939); }
+
+/* ========================================
+   CHRISTMAS TREE LIGHTS
+   ======================================== */
+
+.christmas-light {
+  position: absolute;
+  width: 8px;
+  height: 10px;
+  border-radius: 50% 50% 45% 45%;   /* Slight teardrop shape */
+  z-index: 15;
+  pointer-events: none;
+  animation: lightTwinkle 1.2s ease-in-out infinite alternate;
+  will-change: opacity, transform;
+}
+
+.christmas-light:nth-child(even) {
+  animation-duration: 0.85s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes lightTwinkle {
+  0%   { opacity: 0.65; transform: scale(0.85); }
+  100% { opacity: 1.00; transform: scale(1.18); }
+}
+
+/* ========================================
+   CABIN
+   ======================================== */
+
+.snow-cabin {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.cabin-img {
+  width: 120px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 40, 0.45));
+}
+
+/* Smoke stack — positioned near estimated chimney on the cabin PNG */
+.cabin-smoke-stack {
+  position: absolute;
+  top: 6px;
+  left: 80px;
+}
+
+.smoke-puff {
+  position: absolute;
+  bottom: 0;
+  left: -5px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(205, 210, 220, 0.70) 0%, transparent 70%);
+  filter: blur(4px);
+  animation: smokeRise 3s ease-out var(--smoke-delay, 0s) infinite;
+  pointer-events: none;
+}
+
+@keyframes smokeRise {
+  0%   { opacity: 0;    transform: translateY(0)     translateX(0)   scale(0.3); }
+  12%  { opacity: 0.65; transform: translateY(-8px)  translateX(0)   scale(0.7); }
+  75%  { opacity: 0.28; transform: translateY(-50px) translateX(8px) scale(2.1); }
+  100% { opacity: 0;    transform: translateY(-65px) translateX(12px) scale(2.8); }
+}
+
+/* Warm window-light glow */
+.cabin-window-glow {
+  position: absolute;
+  top: 36px;
+  left: 28px;
+  width: 26px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 180, 55, 0.60) 0%, rgba(255, 140, 20, 0.20) 55%, transparent 80%);
+  animation: windowFlicker 3.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes windowFlicker {
+  0%   { opacity: 0.55; transform: scale(0.95); }
+  30%  { opacity: 0.90; transform: scale(1.05); }
+  65%  { opacity: 0.70; transform: scale(0.98); }
+  100% { opacity: 1.00; transform: scale(1.10); }
+}
+
+/* ========================================
+   BLIZZARD SYSTEM
+   ======================================== */
+
+/* Each of the 300 particles blasts across the screen horizontally */
+.blizzard-particle {
+  position: fixed;
+  top: var(--by, 50vh);
+  left: -20px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, var(--op, 0.7));
+  pointer-events: none;
+  z-index: 25;
+  animation: blizzardBlast var(--dur, 0.8s) linear var(--del, 0s) forwards;
+}
+
+@keyframes blizzardBlast {
+  0%   { transform: translateX(0)                          translateY(0);                  opacity: var(--op, 0.7); }
+  100% { transform: translateX(calc(100vw + 120px))        translateY(var(--drift-y, 0px)); opacity: 0; }
+}
+
+/* Semi-transparent white overlay that descends during blizzard */
+.blizzard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(215, 232, 255, 0);
+  z-index: 20;
+  pointer-events: none;
+  transition: background 1.5s ease;
+}
+
+.blizzard-overlay.active {
+  background: rgba(215, 232, 255, 0.22);
+}

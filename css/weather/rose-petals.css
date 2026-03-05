@@ -1,0 +1,119 @@
+/* ========================================
+   ROSE PETALS WEATHER
+   Falling petals with flutter motion, ground accumulation, sparkle motes
+   ======================================== */
+
+/* Background gradient for rose petals */
+body.bg-rose-petals {
+  background: linear-gradient(-45deg, #ff6b9d, #ffa07a, #ffcccb, #ff9aa2, #ff6b9d);
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* ========================================
+   FALLING ROSE PETAL PARTICLES
+   position: fixed keeps them in viewport space, not document flow.
+   Without this they become flex items in <body> and break the layout.
+   ======================================== */
+
+.rose-petal {
+  position: fixed;
+  pointer-events: none;
+  z-index: 3;
+  will-change: transform, opacity;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Depth layers match .weather-particle pattern in weather-base.css */
+.rose-petal.far   { z-index: 1; }
+.rose-petal.mid   { z-index: 2; }
+.rose-petal.close { z-index: 3; }
+
+/* ========================================
+   GROUND PETAL ACCUMULATION
+   Lives inside #rainBackground (position: fixed, full screen, overflow: hidden),
+   so position: absolute is relative to that container.
+   ======================================== */
+
+.ground-petal {
+  position: absolute;
+  bottom: 4px;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transform-origin: center bottom;
+  animation: groundPetalAppear 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform, opacity;
+  line-height: 1;
+}
+
+@keyframes groundPetalAppear {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--rotation, 0deg)) scale(0.2) translateY(30px);
+  }
+  65% {
+    opacity: 0.92;
+    transform: rotate(var(--rotation, 0deg)) scale(1.08) translateY(-4px);
+  }
+  100% {
+    opacity: 0.82;
+    transform: rotate(var(--rotation, 0deg)) scale(1) translateY(0);
+  }
+}
+
+/* Once the fade-in is done, petals sway gently in residual breeze */
+.ground-petal.settled {
+  animation: petalSettle 5s ease-in-out infinite alternate;
+}
+
+@keyframes petalSettle {
+  0%   { transform: rotate(var(--rotation, 0deg)) translateY(0); }
+  100% { transform: rotate(calc(var(--rotation, 0deg) + 7deg)) translateY(-2px); }
+}
+
+/* ========================================
+   SPARKLE MOTES
+   Appended inside #cloudLayer (position: fixed, top 0, height 200px).
+   They rise upward from the bottom of the cloud layer toward the top.
+   animationDuration and animationDelay are overridden per-element by JS.
+   ======================================== */
+
+.sparkle-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 240, 190, 1)   0%,
+    rgba(255, 210, 130, 0.8) 40%,
+    transparent              80%
+  );
+  box-shadow:
+    0 0 5px 2px rgba(255, 220, 140, 0.7),
+    0 0 12px 4px rgba(255, 190, 100, 0.3);
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: sparkleRise 10s ease-in-out infinite;
+}
+
+@keyframes sparkleRise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0) scale(0.1);
+  }
+  12% {
+    opacity: 0.95;
+    transform: translateY(-22px) translateX(0) scale(1);
+  }
+  80% {
+    opacity: 0.55;
+    transform: translateY(-165px) translateX(var(--sparkle-drift, 0px)) scale(0.75);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-200px) translateX(var(--sparkle-drift, 0px)) scale(0);
+  }
+}
