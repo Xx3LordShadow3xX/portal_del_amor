@@ -33,7 +33,7 @@ body.bg-love-snow {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 65%;
+  height: 55%;
   z-index: 0;
   pointer-events: none;
   opacity: 0;
@@ -47,15 +47,14 @@ body.bg-love-snow {
 /* ========================================
    MOUNTAIN LAYERS — FULL-WIDTH ALPINE RIDGES
    Each mountain is a full-viewport-width div shaped by clip-path.
-   The gradient runs top→bottom of the div: 0% = sky-level (peak),
-   100% = ground. Snow is integrated directly into the gradient —
-   white at the peak, transitioning to dark charcoal rock at the base.
-   This produces the Zermatt blue-hour aesthetic from the reference.
+   Gradient: 0% (top/peak) = snow-white → 100% (base) = near-black rock.
+   ::before overlays an extra snow gradient that is also clipped,
+   making every peak tip visibly snow-capped without separate divs.
 
-   Depth layers:
-     back  — distant range, atmospheric blue haze, soft blur
-     mid   — main visible range, dramatic peaks, some dark rock
-     front — closest, near-black rocky faces, brilliant white snow tips
+   Depth / attenuation rules (Zermatt blue-hour reference):
+     back  — barely perceptible, merges with sky, heavy blur + low opacity
+     mid   — visible but clearly distant, moderate attenuation
+     front — most defined, still subdued so cabin/trees read as foreground
    ======================================== */
 
 .mountain {
@@ -64,16 +63,32 @@ body.bg-love-snow {
   width: 100%;
 }
 
-/* --- BACK RANGE — ghostly atmospheric, full ridge silhouette --- */
+/* Snow caps: white gradient at the top of each mountain div, clipped to
+   mountain shape so every peak tip gets natural snow coverage. */
+.mountain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(238, 246, 255, 0.58) 7%,
+    rgba(215, 235, 255, 0.22) 18%,
+    transparent 32%
+  );
+  pointer-events: none;
+}
+
+/* --- BACK RANGE — ghostly, near-invisible, pure atmosphere ---- */
 .mountain-back {
   height: 68%;
   background: linear-gradient(
     180deg,
-    rgba(215, 232, 255, 0.90) 0%,
-    rgba(185, 208, 240, 0.82) 12%,
-    rgba(138, 162, 208, 0.70) 30%,
-    rgba(88, 112, 168, 0.54) 60%,
-    rgba(48, 68, 125, 0.40) 100%
+    rgba(175, 200, 235, 0.60) 0%,
+    rgba(148, 172, 215, 0.48) 18%,
+    rgba(108, 130, 178, 0.35) 42%,
+    rgba(68, 88, 140, 0.22) 72%,
+    rgba(38, 55, 105, 0.14) 100%
   );
   clip-path: polygon(
     0% 100%, 0% 68%,
@@ -88,20 +103,20 @@ body.bg-love-snow {
     100% 65%, 100% 100%
   );
   z-index: 1;
-  filter: blur(12px);
-  opacity: 0.58;
+  filter: blur(14px);
+  opacity: 0.42;
 }
 
-/* --- MID RANGE — main mountains, dramatic spire, dark faces ---- */
+/* --- MID RANGE — present but clearly behind the tree line ------ */
 .mountain-mid {
   height: 82%;
   background: linear-gradient(
     180deg,
-    rgba(248, 252, 255, 0.97) 0%,
-    rgba(218, 232, 250, 0.92) 8%,
-    rgba(160, 178, 215, 0.87) 22%,
-    rgba(84, 95, 138, 0.82) 50%,
-    rgba(28, 28, 52, 0.78) 100%
+    rgba(210, 225, 248, 0.80) 0%,
+    rgba(175, 195, 230, 0.68) 10%,
+    rgba(128, 148, 195, 0.55) 28%,
+    rgba(68, 80, 122, 0.42) 55%,
+    rgba(22, 24, 46, 0.30) 100%
   );
   clip-path: polygon(
     0% 100%, 0% 76%,
@@ -117,20 +132,20 @@ body.bg-love-snow {
     100% 76%, 100% 100%
   );
   z-index: 2;
-  filter: blur(4px);
-  opacity: 0.84;
+  filter: blur(5px);
+  opacity: 0.58;
 }
 
-/* --- FRONT RANGE — closest, Zermatt-dark rocky face, pure snow peaks */
+/* --- FRONT RANGE — most defined, dark rocky faces with snow tips */
 .mountain-front {
   height: 94%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 1.00) 0%,       /* brilliant white peak snow */
-    rgba(228, 238, 252, 0.98) 5%,
-    rgba(162, 172, 200, 0.96) 16%,      /* snow-to-rock transition */
-    rgba(60, 62, 90, 0.94) 40%,         /* dark rocky face */
-    rgba(14, 14, 26, 0.93) 100%         /* near-black at the valley base */
+    rgba(240, 248, 255, 0.92) 0%,       /* snow-blue peak */
+    rgba(195, 212, 238, 0.82) 8%,
+    rgba(130, 148, 188, 0.72) 22%,      /* rocky transition */
+    rgba(50, 54, 80, 0.65) 48%,         /* dark face, attenuated vs original */
+    rgba(12, 12, 22, 0.58) 100%         /* valley base — transparent enough for sky */
   );
   clip-path: polygon(
     0% 100%, 0% 82%,
@@ -149,8 +164,8 @@ body.bg-love-snow {
     100% 100%
   );
   z-index: 3;
-  filter: blur(0px);
-  opacity: 0.95;
+  filter: blur(1px);
+  opacity: 0.72;
 }
 
 /* Mountain Fog */
@@ -824,4 +839,25 @@ body.bg-love-snow {
 
 .blizzard-overlay.active {
   background: rgba(215, 232, 255, 0.22);
+}
+
+/* ========================================
+   PHYSICS SMOKE PARTICLES
+   Driven entirely by JS — position, size, opacity, and filter are
+   all set per-frame. CSS only defines the visual appearance type.
+   z-index 9 places smoke above the cabin (8) but below UI glass.
+   ======================================== */
+
+.smoke-particle-dynamic {
+  position: fixed;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(200, 212, 225, 0.82) 0%,
+    rgba(178, 192, 208, 0.52) 38%,
+    transparent 72%
+  );
+  pointer-events: none;
+  z-index: 9;
+  will-change: left, top, opacity, filter;
 }

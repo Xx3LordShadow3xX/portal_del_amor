@@ -37,6 +37,17 @@ const LoveSnow = {
   blizzardActive:        false,
   blizzardShakeInterval: null,
 
+  // Physics smoke system
+  smokeParticles:    [],
+  smokeRaf:          null,
+  smokeEmitTimeout:  null,
+  smokeOriginX:      0,
+  smokeOriginY:      0,
+  smokeMouseX:       0,
+  smokeMouseY:       0,
+  smokeMouseHandler: null,
+  smokeLastSecond:   -1,
+
   // ---- Snow data ----
   snowColors: [
     '#ffffff','#f0f8ff','#e6f2ff','#f5f5ff',
@@ -94,6 +105,7 @@ const LoveSnow = {
     console.log('❄️ Love Snow weather stopped');
 
     // Accept passed references so stop() works even if called before start()
+    if (sharedState)    this.shared         = sharedState;
     this.cloudLayer     = cloudLayer;
     this.rainBackground = rainBackground;
     this.alpineScene    = alpineScene;
@@ -113,6 +125,9 @@ const LoveSnow = {
 
     // Aurora
     if (this.auroraEl) { this.auroraEl.remove(); this.auroraEl = null; }
+
+    // Smoke
+    this.stopSmokeSystem();
 
     // Blizzard
     if (this.blizzardTimeout)       { clearTimeout(this.blizzardTimeout);       this.blizzardTimeout = null; }
@@ -397,13 +412,11 @@ const LoveSnow = {
     cabin.style.left   = '23%';
     cabin.style.bottom = '0';   // Grounded at the base of the alpine scene
 
+    // Static CSS smoke is replaced by the physics system below.
+    // The smoke-stack div is kept as a positional anchor for the chimney origin.
     cabin.innerHTML = `
       <img src="assets/cabin.png" alt="Cozy Cabin" class="cabin-img">
-      <div class="cabin-smoke-stack">
-        <div class="smoke-puff" style="--smoke-delay:0s"></div>
-        <div class="smoke-puff" style="--smoke-delay:1s"></div>
-        <div class="smoke-puff" style="--smoke-delay:2s"></div>
-      </div>
+      <div class="cabin-smoke-stack"></div>
     `;
 
     // Christmas lights strung along the cabin eave with a catenary droop.
@@ -429,6 +442,178 @@ const LoveSnow = {
     this.alpineScene.appendChild(cabin);
     this.cabinEl = cabin;
     console.log('🏡 Cabin placed');
+
+    // Start the physics smoke system once the cabin is in the DOM
+    // (rAF ensures layout is computed before we read bounding rects)
+    requestAnimationFrame(() => this.createSmokeSystem(cabin));
+  },
+
+  /* ==========================================
+     PHYSICS SMOKE SYSTEM
+     Replaces static CSS smoke-puff animations.
+
+     Each particle is a DOM div driven by a per-frame physics step:
+       - Upward thermal buoyancy   (constant negative vy)
+       - Wind bias                  (from shared.currentWindForce)
+       - Micro-turbulence           (bounded random perturbation)
+       - Mouse proximity repulsion  (soft, quadratic decay, capped force)
+       - Quadratic drag             (velocity * 0.975 per frame)
+       - Hard speed cap             (3.5 px/frame)
+
+     Mouse interaction is intentionally weak (max 0.35 px/frame) so
+     environmental wind always reads as the dominant force.
+     ========================================== */
+
+  createSmokeSystem: function(cabinEl) {
+    if (!cabinEl || !document.body.classList.contains('bg-love-snow')) return;
+
+    const self       = this;
+    const stackEl    = cabinEl.querySelector('.cabin-smoke-stack');
+    if (!stackEl) return;
+
+    // Cache chimney origin; recalculate each second in the RAF loop.
+    const updateOrigin = () => {
+      const r = stackEl.getBoundingClientRect();
+      self.smokeOriginX = r.left + r.width / 2;
+      self.smokeOriginY = r.top;
+    };
+    updateOrigin();
+
+    // Mouse tracking — store cursor world position
+    self.smokeMouseHandler = (e) => {
+      self.smokeMouseX = e.clientX;
+      self.smokeMouseY = e.clientY;
+    };
+    document.addEventListener('mousemove', self.smokeMouseHandler);
+
+    // ----- Emission scheduler (semi-random bursts) ----------------
+    const scheduleEmit = () => {
+      if (!document.body.classList.contains('bg-love-snow')) return;
+      // 1–2 particles per burst; next burst in 280–620 ms
+      const count = 1 + (Math.random() < 0.35 ? 1 : 0);
+      for (let i = 0; i < count; i++) self.emitSmokeParticle();
+      self.smokeEmitTimeout = setTimeout(scheduleEmit, 280 + Math.random() * 340);
+    };
+    scheduleEmit();
+
+    // ----- Physics RAF loop ---------------------------------------
+    const tick = (timestamp) => {
+      if (!document.body.classList.contains('bg-love-snow')) return;
+
+      // Refresh chimney position once per second (handles resize)
+      const sec = Math.floor(timestamp / 1000);
+      if (sec !== self.smokeLastSecond) {
+        updateOrigin();
+        self.smokeLastSecond = sec;
+      }
+
+      self.updateSmokeParticles();
+      self.smokeRaf = requestAnimationFrame(tick);
+    };
+    self.smokeRaf = requestAnimationFrame(tick);
+
+    console.log('💨 Smoke system started');
+  },
+
+  emitSmokeParticle: function() {
+    if (!document.body.classList.contains('bg-love-snow')) return;
+
+    const el = document.createElement('div');
+    el.className = 'smoke-particle-dynamic';
+    document.body.appendChild(el);
+
+    // Initial velocity: wind-biased horizontal, strong upward
+    const windBias = (this.shared ? this.shared.currentWindForce : 0) * 0.25;
+
+    this.smokeParticles.push({
+      el,
+      x:         this.smokeOriginX + (Math.random() - 0.5) * 10,
+      y:         this.smokeOriginY + (Math.random() - 0.5) * 4,
+      vx:        windBias + (Math.random() - 0.5) * 0.5,
+      vy:        -0.85 - Math.random() * 0.45,      // upward initial burst
+      life:      0,                                  // 0 = born, 1 = dead
+      lifeSpeed: 0.0028 + Math.random() * 0.003,    // ~4–6 second lifespan
+      size0:     10  + Math.random() * 8,            // birth diameter (px)
+      size1:     52  + Math.random() * 38,           // death diameter (px)
+    });
+  },
+
+  updateSmokeParticles: function() {
+    const wind  = this.shared ? this.shared.currentWindForce : 0;
+    const mx    = this.smokeMouseX;
+    const my    = this.smokeMouseY;
+    const MOUSE_R = 110;   // influence radius (px)
+
+    for (let i = this.smokeParticles.length - 1; i >= 0; i--) {
+      const p = this.smokeParticles[i];
+
+      // Advance life
+      p.life += p.lifeSpeed;
+      if (p.life >= 1) {
+        p.el.remove();
+        this.smokeParticles.splice(i, 1);
+        continue;
+      }
+
+      // ---- Environmental physics --------------------------------
+      p.vy -= 0.052;                               // upward buoyancy
+      p.vx += wind * 0.10;                         // wind (primary H force)
+      p.vx += (Math.random() - 0.5) * 0.055;      // micro-turbulence X
+      p.vy += (Math.random() - 0.5) * 0.025;      // micro-turbulence Y
+
+      // ---- Mouse proximity — soft quadratic repulsion ----------
+      const dx   = p.x - mx;
+      const dy   = p.y - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < MOUSE_R && dist > 0.5) {
+        const t     = 1 - dist / MOUSE_R;
+        const force = t * t * 0.32;               // max ~0.32 px/frame at contact
+        p.vx += (dx / dist) * force;
+        p.vy += (dy / dist) * force;
+      }
+
+      // ---- Drag ------------------------------------------------
+      p.vx *= 0.976;
+      p.vy *= 0.976;
+
+      // ---- Speed cap (prevents mouse catapulting) --------------
+      const spd = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (spd > 3.2) { p.vx = p.vx / spd * 3.2; p.vy = p.vy / spd * 3.2; }
+
+      // ---- Integrate -------------------------------------------
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // ---- Visual update ---------------------------------------
+      const t      = p.life;
+      // Opacity: 0 → 0.68 peak at t≈0.3 → 0 (uses sin arch shape)
+      const opacity = Math.pow(Math.sin(t * Math.PI), 0.65) * 0.68;
+      // Size: linearly grows birth → death
+      const size    = p.size0 + (p.size1 - p.size0) * t;
+      // Blur: increases as particle disperses
+      const blur    = 2 + t * 14;
+
+      const half = size * 0.5;
+      p.el.style.left    = (p.x - half) + 'px';
+      p.el.style.top     = (p.y - half) + 'px';
+      p.el.style.width   = size + 'px';
+      p.el.style.height  = size + 'px';
+      p.el.style.opacity = opacity.toFixed(3);
+      p.el.style.filter  = `blur(${blur.toFixed(1)}px)`;
+    }
+  },
+
+  stopSmokeSystem: function() {
+    if (this.smokeRaf)         { cancelAnimationFrame(this.smokeRaf); this.smokeRaf = null; }
+    if (this.smokeEmitTimeout) { clearTimeout(this.smokeEmitTimeout); this.smokeEmitTimeout = null; }
+    if (this.smokeMouseHandler) {
+      document.removeEventListener('mousemove', this.smokeMouseHandler);
+      this.smokeMouseHandler = null;
+    }
+    this.smokeParticles.forEach(p => p.el.remove());
+    this.smokeParticles  = [];
+    this.smokeLastSecond = -1;
+    console.log('💨 Smoke system stopped');
   },
 
   /* ==========================================
