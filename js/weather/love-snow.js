@@ -245,22 +245,11 @@ const LoveSnow = {
 
     console.log('🏔️ Creating Alpine Scene');
 
-    // Mountains
-    const mountainDefs = [
-      { type: 'back',  left: '5%'  }, { type: 'back',  left: '25%' },
-      { type: 'mid',   left: '15%' }, { type: 'back',  left: '50%' },
-      { type: 'mid',   left: '40%' }, { type: 'front', left: '30%' },
-      { type: 'back',  left: '70%' }, { type: 'mid',   left: '65%' },
-      { type: 'front', left: '75%' }, { type: 'back',  left: '85%' }
-    ];
-
-    mountainDefs.forEach(def => {
+    // Mountains — 3 full-viewport-width ridge bands, depth-sorted.
+    // Snow is baked into each band's gradient (white at peak, dark at base).
+    ['back', 'mid', 'front'].forEach(type => {
       const mountain = document.createElement('div');
-      mountain.classList.add('mountain', `mountain-${def.type}`);
-      mountain.style.left = def.left;
-      const cap = document.createElement('div');
-      cap.classList.add('snow-cap');
-      mountain.appendChild(cap);
+      mountain.classList.add('mountain', `mountain-${type}`);
       this.alpineScene.appendChild(mountain);
     });
 
@@ -406,7 +395,7 @@ const LoveSnow = {
     const cabin = document.createElement('div');
     cabin.className  = 'snow-cabin';
     cabin.style.left   = '23%';
-    cabin.style.bottom = '14%';
+    cabin.style.bottom = '0';   // Grounded at the base of the alpine scene
 
     cabin.innerHTML = `
       <img src="assets/cabin.png" alt="Cozy Cabin" class="cabin-img">
@@ -415,8 +404,27 @@ const LoveSnow = {
         <div class="smoke-puff" style="--smoke-delay:1s"></div>
         <div class="smoke-puff" style="--smoke-delay:2s"></div>
       </div>
-      <div class="cabin-window-glow"></div>
     `;
+
+    // Christmas lights strung along the cabin eave with a catenary droop.
+    // Spans the full 380px cabin width; baseY is the estimated eave height.
+    const lightColors = ['#FF2828', '#22EE22', '#4488FF', '#FFD700', '#FF22CC'];
+    const lightCount  = 15;
+    const baseY       = 112;  // px from top of cabin image — adjust if needed
+    for (let i = 0; i < lightCount; i++) {
+      const light  = document.createElement('div');
+      light.className = 'christmas-light';
+      const xFrac  = i / (lightCount - 1);
+      const xPos   = 8 + xFrac * 364;                  // 8px → 372px across cabin
+      const droop  = Math.sin(xFrac * Math.PI) * 12;   // catenary sag at centre
+      light.style.left            = xPos + 'px';
+      light.style.top             = (baseY + droop) + 'px';
+      const color = lightColors[i % 5];
+      light.style.background      = color;
+      light.style.boxShadow       = `0 0 5px 2px ${color}aa, 0 0 14px 6px ${color}44`;
+      light.style.animationDelay  = (i * 0.18) + 's';
+      cabin.appendChild(light);
+    }
 
     this.alpineScene.appendChild(cabin);
     this.cabinEl = cabin;
