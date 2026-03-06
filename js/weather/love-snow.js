@@ -254,11 +254,9 @@ const LoveSnow = {
       const mountain = document.createElement('div');
       mountain.classList.add('mountain', `mountain-${def.type}`);
       mountain.style.left = def.left;
-      if (def.type !== 'front') {
-        const cap = document.createElement('div');
-        cap.classList.add('snow-cap');
-        mountain.appendChild(cap);
-      }
+      const cap = document.createElement('div');
+      cap.classList.add('snow-cap');
+      mountain.appendChild(cap);
       this.alpineScene.appendChild(mountain);
     });
 
@@ -403,7 +401,7 @@ const LoveSnow = {
   createCabin: function() {
     const cabin = document.createElement('div');
     cabin.className  = 'snow-cabin';
-    cabin.style.left   = '28%';
+    cabin.style.left   = '23%';
     cabin.style.bottom = '14%';
 
     cabin.innerHTML = `
