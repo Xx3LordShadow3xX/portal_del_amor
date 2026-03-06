@@ -211,9 +211,13 @@ const LoveSnow = {
     const aurora = document.createElement('div');
     aurora.className = 'aurora-container';
     aurora.innerHTML = `
+      <div class="aurora-horizon"></div>
+      <div class="aurora-curtains"></div>
       <div class="aurora-wave aurora-wave-1"></div>
       <div class="aurora-wave aurora-wave-2"></div>
       <div class="aurora-wave aurora-wave-3"></div>
+      <div class="aurora-wave aurora-wave-4"></div>
+      <div class="aurora-wave aurora-wave-5"></div>
     `;
     document.body.appendChild(aurora);
     this.auroraEl = aurora;
