@@ -777,11 +777,14 @@ body.bg-love-snow {
   filter: drop-shadow(0 8px 28px rgba(0, 0, 40, 0.65));
 }
 
-/* Smoke stack — scaled proportionally for the 380px cabin */
+/* Smoke stack — anchored to the chimney tip. Measured directly from
+   cabin.png's pixel content (chimney apex at ~(673,125) of the 1024px
+   square canvas), scaled to the 380px render width: 673/1024*380≈250,
+   125/1024*380≈46. */
 .cabin-smoke-stack {
   position: absolute;
-  top: 12px;
-  left: 155px;
+  top: 40px;
+  left: 250px;
 }
 
 .smoke-puff {

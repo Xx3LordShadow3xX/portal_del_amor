@@ -410,7 +410,11 @@ const LoveSnow = {
     const cabin = document.createElement('div');
     cabin.className  = 'snow-cabin';
     cabin.style.left   = '2%';
-    cabin.style.bottom = '0';   // Grounded at the base of the alpine scene
+    // cabin.png bakes in ~115px of transparent space below the actual
+    // log structure (a soft ambient-shadow fade, measured out to row 908
+    // of 1024px) — at the 380px render width that's ~43px of "floating"
+    // if bottom is just 0. Shift down so the real base touches the ground.
+    cabin.style.bottom = '-43px';
 
     // Static CSS smoke is replaced by the physics system below.
     // The smoke-stack div is kept as a positional anchor for the chimney origin.
