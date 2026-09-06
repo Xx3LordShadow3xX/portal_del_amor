@@ -413,8 +413,9 @@ const LoveSnow = {
     // cabin.png bakes in ~115px of transparent space below the actual
     // log structure (a soft ambient-shadow fade, measured out to row 908
     // of 1024px) — at the 380px render width that's ~43px of "floating"
-    // if bottom is just 0. Shift down so the real base touches the ground.
-    cabin.style.bottom = '-43px';
+    // if bottom is just 0. Shift down so the real base touches the ground
+    // (nudged an extra ~22px per visual feedback — still slightly high).
+    cabin.style.bottom = '-65px';
 
     // Static CSS smoke is replaced by the physics system below.
     // The smoke-stack div is kept as a positional anchor for the chimney origin.
@@ -423,19 +424,45 @@ const LoveSnow = {
       <div class="cabin-smoke-stack"></div>
     `;
 
-    // Christmas lights strung along the cabin eave with a catenary droop.
-    // Spans the full 380px cabin width; baseY is the estimated eave height.
+    // Christmas lights strung along the ACTUAL roofline, not a floating
+    // catenary arc. Points below are the roof's top-edge silhouette,
+    // traced directly from cabin.png's alpha channel (topmost opaque
+    // pixel per column, sampled every 10px across the 1024px canvas),
+    // with the chimney's interruption (raw x 600–780, where the chimney
+    // itself pokes above the roof) bridged by interpolation so the
+    // strand runs along the roof surface behind/in front of it instead
+    // of detouring up the chimney's silhouette.
+    const roofProfile = [
+      [110,569],[150,534],[190,493],[230,438],[270,378],[310,332],
+      [350,305],[390,297],[430,301],[470,313],[510,324],[550,334],
+      [590,339],[650,353],[700,366],[780,386],[820,477],[860,528],[900,569]
+    ];
+    const CANVAS = 1024, RENDER = 380;
+    const scale = RENDER / CANVAS;
+    function roofYAt(rawX) {
+      for (let i = 0; i < roofProfile.length - 1; i++) {
+        const [x0, y0] = roofProfile[i];
+        const [x1, y1] = roofProfile[i + 1];
+        if (rawX >= x0 && rawX <= x1) {
+          const t = (rawX - x0) / (x1 - x0);
+          return y0 + (y1 - y0) * t;
+        }
+      }
+      return roofProfile[roofProfile.length - 1][1];
+    }
+
     const lightColors = ['#FF2828', '#22EE22', '#4488FF', '#FFD700', '#FF22CC'];
     const lightCount  = 15;
-    const baseY       = 112;  // px from top of cabin image — adjust if needed
+    const rawXStart   = roofProfile[0][0];
+    const rawXEnd     = roofProfile[roofProfile.length - 1][0];
     for (let i = 0; i < lightCount; i++) {
       const light  = document.createElement('div');
       light.className = 'christmas-light';
       const xFrac  = i / (lightCount - 1);
-      const xPos   = 8 + xFrac * 364;                  // 8px → 372px across cabin
-      const droop  = Math.sin(xFrac * Math.PI) * 12;   // catenary sag at centre
-      light.style.left            = xPos + 'px';
-      light.style.top             = (baseY + droop) + 'px';
+      const rawX   = rawXStart + xFrac * (rawXEnd - rawXStart);
+      const rawY   = roofYAt(rawX) - 14; // hover just above the roof surface
+      light.style.left = (rawX * scale) + 'px';
+      light.style.top  = (rawY * scale) + 'px';
       const color = lightColors[i % 5];
       light.style.background      = color;
       light.style.boxShadow       = `0 0 5px 2px ${color}aa, 0 0 14px 6px ${color}44`;
@@ -526,8 +553,10 @@ const LoveSnow = {
     el.className = 'smoke-particle-dynamic';
     document.body.appendChild(el);
 
-    // Initial velocity: wind-biased horizontal, strong upward
-    const windBias = (this.shared ? this.shared.currentWindForce.x : 0) * 0.25;
+    // Initial velocity: wind-biased horizontal, strong upward.
+    // Sign flipped (mirrored across the vertical/y axis) so smoke
+    // deflects to the right instead of the left under wind.
+    const windBias = (this.shared ? this.shared.currentWindForce.x : 0) * -0.25;
 
     this.smokeParticles.push({
       el,
@@ -561,7 +590,7 @@ const LoveSnow = {
 
       // ---- Environmental physics --------------------------------
       p.vy -= 0.052;                               // upward buoyancy
-      p.vx += wind * 0.10;                         // wind (primary H force)
+      p.vx += wind * -0.10;                        // wind (primary H force, mirrored — see emitSmokeParticle)
       p.vx += (Math.random() - 0.5) * 0.055;      // micro-turbulence X
       p.vy += (Math.random() - 0.5) * 0.025;      // micro-turbulence Y
 
