@@ -409,7 +409,7 @@ const LoveSnow = {
   createCabin: function() {
     const cabin = document.createElement('div');
     cabin.className  = 'snow-cabin';
-    cabin.style.left   = '23%';
+    cabin.style.left   = '2%';
     cabin.style.bottom = '0';   // Grounded at the base of the alpine scene
 
     // Static CSS smoke is replaced by the physics system below.
@@ -523,7 +523,7 @@ const LoveSnow = {
     document.body.appendChild(el);
 
     // Initial velocity: wind-biased horizontal, strong upward
-    const windBias = (this.shared ? this.shared.currentWindForce : 0) * 0.25;
+    const windBias = (this.shared ? this.shared.currentWindForce.x : 0) * 0.25;
 
     this.smokeParticles.push({
       el,
@@ -539,7 +539,7 @@ const LoveSnow = {
   },
 
   updateSmokeParticles: function() {
-    const wind  = this.shared ? this.shared.currentWindForce : 0;
+    const wind  = this.shared ? this.shared.currentWindForce.x : 0;
     const mx    = this.smokeMouseX;
     const my    = this.smokeMouseY;
     const MOUSE_R = 110;   // influence radius (px)
