@@ -109,11 +109,14 @@ const HeartRain = {
       const duration = 0.3 + Math.random() * 0.5;
       streak.style.animationDuration = duration + 's';
       streak.style.animationDelay = -(Math.random() * duration) + 's';
-      streak.style.transform = 'rotate(8deg)';
-      
+      // Rotation comes from the shared --rain-angle custom property
+      // (set once per frame on the container in updateRainAngles),
+      // not per-element inline styles — see .rain-streak in heart-rain.css.
+
       this.rainBackground.appendChild(streak);
       this.rainStreaks.push(streak);
     }
+    this.rainBackground.style.setProperty('--rain-angle', '8deg');
   },
   
   // Spawn loop for heart particles
@@ -304,15 +307,17 @@ const HeartRain = {
     interpolateWind();
   },
   
-  // Update rain streak angles based on wind
+  // Update rain streak angles based on wind.
+  // All 150 streaks always share the exact same angle (wind is global,
+  // not per-particle), so writing inline transform to each of them here
+  // meant 150 style writes every single animation frame — one of the
+  // biggest perf costs in this weather. Instead we write ONE CSS custom
+  // property on the shared container, and every .rain-streak reads it
+  // via `rotate(var(--rain-angle))` in CSS (see heart-rain.css).
   updateRainAngles: function() {
-    this.rainStreaks.forEach(streak => {
-      const baseAngle = 8;
-      const windAngle = this.shared.currentWindForce.x * 15;
-      const totalAngle = baseAngle + windAngle;
-      
-      streak.style.transform = `rotate(${totalAngle}deg)`;
-    });
+    const baseAngle = 8;
+    const windAngle = this.shared.currentWindForce.x * 15;
+    this.rainBackground.style.setProperty('--rain-angle', `${baseAngle + windAngle}deg`);
   },
   
   // Wind gust system

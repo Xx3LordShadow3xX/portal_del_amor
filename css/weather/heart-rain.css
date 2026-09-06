@@ -21,6 +21,11 @@ body.bg-heart-rain {
   filter: blur(0.5px);
   opacity: 0.6;
   will-change: transform;
+  /* Wind angle is one shared value written once/frame on #rainBackground
+     (see updateRainAngles() in heart-rain.js) instead of on each of the
+     150 streaks individually — was the single biggest per-frame cost
+     in this weather. */
+  transform: rotate(var(--rain-angle, 8deg));
 }
 
 /* ========================================

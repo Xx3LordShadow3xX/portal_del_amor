@@ -5,28 +5,40 @@
 
 const ClearSky = {
   starSpawnInterval: null,
+  initialStarTimeouts: [],
   shared: null,
-  
+
   // Start clear sky weather
   start: function(sharedState) {
     this.shared = sharedState;
     console.log('Starting Clear Sky weather');
-    
-    // Initial stars
+
+    // Initial stars, staggered up to 4s out. Timeout ids are tracked and
+    // cleared in stop() — otherwise switching away from Clear Sky within
+    // that window leaves them to fire later and drop stray .bg-star
+    // elements onto <body> regardless of whatever weather is now active.
     for (let i = 0; i < 8; i++) {
-      setTimeout(() => this.createBackgroundStar(), i * 500);
+      const id = setTimeout(() => {
+        // Defense in depth: stop() clears these on switch-away, but also
+        // guard here in case one was already queued to run.
+        if (!document.body.classList.contains('bg-clear-sky')) return;
+        this.createBackgroundStar();
+      }, i * 500);
+      this.initialStarTimeouts.push(id);
     }
-    
+
     // Start continuous star spawning
     this.startStarSpawning();
   },
-  
+
   // Stop clear sky weather
   stop: function() {
     if (this.starSpawnInterval) {
       clearInterval(this.starSpawnInterval);
       this.starSpawnInterval = null;
     }
+    this.initialStarTimeouts.forEach(id => clearTimeout(id));
+    this.initialStarTimeouts = [];
     document.querySelectorAll('.bg-star').forEach(star => star.remove());
     console.log('Clear Sky weather stopped');
   },

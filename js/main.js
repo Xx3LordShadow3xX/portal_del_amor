@@ -107,13 +107,22 @@ function createHeart(heartTypes) {
 }
 
 // Setup mouse trail hearts
-// Throttled to ~60fps (16ms) so fast mouse movement doesn't flood the DOM
+// This runs unconditionally regardless of which weather (if any) is
+// active, so it's pure overhead stacked on top of whatever particle
+// system is already running. Throttled to ~25fps (40ms) instead of the
+// previous 60fps (16ms) — more than halves DOM churn on fast mouse
+// movement with no visible difference in trail smoothness — and capped
+// at MAX_TRAIL_HEARTS concurrent elements as a hard backstop in case
+// removal timers ever fall behind (e.g. under heavy weather load).
 function setupMouseTrail() {
   let lastTrailTime = 0;
+  const MAX_TRAIL_HEARTS = 20;
+  let activeTrailHearts = 0;
 
   document.addEventListener('mousemove', (e) => {
     const now = Date.now();
-    if (now - lastTrailTime < 16) return;
+    if (now - lastTrailTime < 40) return;
+    if (activeTrailHearts >= MAX_TRAIL_HEARTS) return;
     lastTrailTime = now;
 
     const trailHeart = document.createElement('div');
@@ -122,9 +131,11 @@ function setupMouseTrail() {
     trailHeart.style.left = (e.clientX - 10 + Math.random() * 20) + 'px';
     trailHeart.style.top  = (e.clientY - 10 + Math.random() * 20) + 'px';
     document.body.appendChild(trailHeart);
+    activeTrailHearts++;
 
     setTimeout(() => {
       trailHeart.remove();
+      activeTrailHearts--;
     }, 800);
   });
 }

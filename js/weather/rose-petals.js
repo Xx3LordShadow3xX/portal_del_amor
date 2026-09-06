@@ -10,6 +10,7 @@ const RosePetals = {
   windGustInterval: null,
   groundPetals: [],
   maxGroundPetals: 25,
+  initialPetalTimeouts: [],
   
   // Rose colors - reds, pinks, whites
   petalColors: [
@@ -59,6 +60,14 @@ const RosePetals = {
       this.windGustInterval = null;
     }
 
+    // createInitialGroundPetals() staggers 15 setTimeout calls up to
+    // ~2.2s apart. If the weather is switched away before all of them
+    // fire, the leftover ones would still call addGroundPetal() later —
+    // appending new .ground-petal nodes into #rainBackground, which by
+    // then belongs to whatever weather is now active. Clear them all.
+    this.initialPetalTimeouts.forEach(id => clearTimeout(id));
+    this.initialPetalTimeouts = [];
+
     // Clean up layers
     if (this.cloudLayer) {
       this.cloudLayer.innerHTML = '';
@@ -102,15 +111,20 @@ const RosePetals = {
   // Create initial ground petals
   createInitialGroundPetals: function() {
     const initialCount = 15;
-    
+    const self = this;
+
     for (let i = 0; i < initialCount; i++) {
-      setTimeout(() => {
-        this.addGroundPetal(
+      const id = setTimeout(() => {
+        // Defense in depth: stop() clears these timeouts on switch-away,
+        // but also guard here in case one was already queued to run.
+        if (!document.body.classList.contains('bg-rose-petals')) return;
+        self.addGroundPetal(
           Math.random() * window.innerWidth,
           Math.random() * 360,
-          this.petalColors[Math.floor(Math.random() * this.petalColors.length)]
+          self.petalColors[Math.floor(Math.random() * self.petalColors.length)]
         );
       }, i * 150);
+      this.initialPetalTimeouts.push(id);
     }
   },
   

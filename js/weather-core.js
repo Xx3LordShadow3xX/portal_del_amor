@@ -72,7 +72,13 @@ const WeatherSystem = {
     weatherOptions.forEach(option => {
       option.addEventListener('click', () => {
         const weatherType = option.dataset.weather;
-        
+
+        // Re-selecting the already-active weather would otherwise tear
+        // down and rebuild the entire particle system (150 rain streaks,
+        // wind loops, alpine scene, etc.) for no visual change — pure
+        // wasted work and a visible stutter. Skip it.
+        if (weatherType === this.currentWeather) return;
+
         // Update selection
         weatherOptions.forEach(opt => {
           opt.classList.remove('selected');
